@@ -6,6 +6,9 @@ public enum Style
     Header2 = 2,
     Header3 = 3,
     Header4 = 4,
+    Header5 = 5,
+    Header6 = 6,
     Bold,
-    Italic
+    Italic,
+    LineBreak
 }
