@@ -6,26 +6,64 @@ namespace Markdown.Classes;
 
 public class Parser : IParser
 {
-    private static readonly Dictionary<string, Style> _tegsToStyle = new Dictionary<string, Style>() {
-        { "_", Style.Italic }, { "__", Style.Bold } };
-
     public bool TryParse(List<Token> tokensBeParsed, ref string line)
-    {
-        StringBuilder stringBuilder = new StringBuilder(line);
-        
+    {   
         if (tokensBeParsed.Count != 0)
             tokensBeParsed.Clear();
 
-        CheckHeader(stringBuilder, tokensBeParsed);
+        CheckHeader(tokensBeParsed, ref line);
         
+        var words = line.Split(' ');
+        var stack = new Stack<Token>();
+        int lengthVerifiedWords = 0;
 
-        
-        line = stringBuilder.ToString();
+        foreach (var word in words)
+        {
+            var tmpStack = new Stack<Token>();
+
+            for (int i = 0; i < word.Length; i++)
+            {
+                if (word[i] == '_')
+                {
+                    Style style = word[i + 1] == '_' ? Style.Bold : Style.Italic;
+
+                    if (i == 0)
+                    {
+                        Token tmpToken = new Token(lengthVerifiedWords, -1, style);
+
+                        tokensBeParsed.Add(tmpToken);
+                        stack.Push(tmpToken);
+                        tmpStack.Push(tmpToken);
+                    }
+                    else if (i == word.Length - 1)
+                    {
+                        if (!TryFindTokenEnd(tmpStack, style, i, lengthVerifiedWords) 
+                            && !TryFindTokenEnd(stack, style, i, lengthVerifiedWords))
+                        {
+                            var tmpToken = new Token(i + lengthVerifiedWords, -1, style);
+
+                            tokensBeParsed.Add(tmpToken);
+                            stack.Push(tmpToken);
+                        }
+                    }
+                    else
+                    {
+
+                    }
+
+                }
+            }
+
+            lengthVerifiedWords += word.Length + 1;
+        }
+
         return true;
     }
 
-    private void CheckHeader(StringBuilder stringBuilder, List<Token> tokensBeParsed)
+    private void CheckHeader(List<Token> tokensBeParsed, ref string line)
     {
+        var stringBuilder = new StringBuilder(line);
+
         if (stringBuilder[0] == '#')
         {
             int firstTextIndex = 1;
@@ -58,14 +96,50 @@ public class Parser : IParser
 
                             stringBuilder.Remove(lastTextIndex, stringBuilder.Length - lastTextIndex);
 
-                            tokensBeParsed.Add(new Token(0, (uint)stringBuilder.Length - 1, isAllSpace ?
+                            tokensBeParsed.Add(new Token(0, stringBuilder.Length - 1, isAllSpace ?
                                                                         Style.LineBreak : (Style)firstTextIndex));
                         }
                     }
                     else
-                        tokensBeParsed.Add(new Token(0, (uint)stringBuilder.Length - 1, (Style)firstTextIndex));
+                        tokensBeParsed.Add(new Token(0, stringBuilder.Length - 1, (Style)firstTextIndex));
                 }
             }
         }
+
+        line = stringBuilder.ToString();
+    }
+
+    private bool TryFindTokenEnd(Stack<Token> stackTokens, Style style, int index, int lengthVerifiedWords)
+    {
+        if (stackTokens.Count > 2)
+        {
+            if (stackTokens.Peek().Style == style)
+            {
+                var tmpToken = stackTokens.Pop();
+
+                tmpToken.EndIndex = index + lengthVerifiedWords;
+                return true;
+            }
+            else
+            {
+                while (stackTokens.Count > 1)
+                    stackTokens.Pop();
+
+                var tmpToken = stackTokens.Pop();
+
+                tmpToken.EndIndex = index + lengthVerifiedWords;
+                tmpToken.Style = Style.Italic;
+                return true;
+            }
+        }
+        else if (stackTokens.Peek().Style == style)
+        {
+            var tmpToken = stackTokens.Pop();
+
+            tmpToken.EndIndex = index + lengthVerifiedWords;
+            return true;
+        }
+
+        return false;
     }
 }
