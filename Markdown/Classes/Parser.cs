@@ -6,10 +6,9 @@ namespace Markdown.Classes;
 
 public class Parser : IParser
 {
-    public bool TryParse(List<Token> tokensBeParsed, ref string line)
+    public List<Token> TryParse(ref string line)
     {   
-        if (tokensBeParsed.Count != 0)
-            tokensBeParsed.Clear();
+        var tokensBeParsed = new List<Token>();
 
         CheckHeader(tokensBeParsed, ref line);
         
@@ -25,7 +24,7 @@ public class Parser : IParser
             {
                 if (word[i] == '_')
                 {
-                    Style style = word[i + 1] == '_' ? Style.Bold : Style.Italic;
+                    Style style = i != word.Length - 1 && word[i + 1] == '_' ? Style.Bold : Style.Italic;
 
                     if (i == 0)
                     {
@@ -34,8 +33,10 @@ public class Parser : IParser
                         tokensBeParsed.Add(tmpToken);
                         stack.Push(tmpToken);
                         tmpStack.Push(tmpToken);
+
+                        i += style == Style.Italic ? 0 : 1;
                     }
-                    else if (i == word.Length - 1)
+                    else if (i == word.Length - (style == Style.Italic ? 1 : 2))
                     {
                         if (!TryFindTokenEnd(tmpStack, style, i, lengthVerifiedWords) 
                             && !TryFindTokenEnd(stack, style, i, lengthVerifiedWords))
@@ -48,16 +49,23 @@ public class Parser : IParser
                     }
                     else
                     {
+                        if (!TryFindTokenEnd(tmpStack, style, i, lengthVerifiedWords))
+                        {
+                            var tmpToken = new Token(i + lengthVerifiedWords, -1, style);
 
+                            tokensBeParsed.Add(tmpToken);
+                            stack.Push(tmpToken);
+                        }
+
+                        i += style == Style.Italic ? 0 : 1;
                     }
-
                 }
             }
 
             lengthVerifiedWords += word.Length + 1;
         }
 
-        return true;
+        return tokensBeParsed;
     }
 
     private void CheckHeader(List<Token> tokensBeParsed, ref string line)
@@ -111,7 +119,10 @@ public class Parser : IParser
 
     private bool TryFindTokenEnd(Stack<Token> stackTokens, Style style, int index, int lengthVerifiedWords)
     {
-        if (stackTokens.Count > 2)
+        if (stackTokens.Count == 0)
+            return false;
+
+        if (stackTokens.Count == 3)
         {
             if (stackTokens.Peek().Style == style)
             {

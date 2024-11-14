@@ -8,7 +8,7 @@ public interface IRenderer
     /// Рендерить из токенов HTML-код
     /// </summary>
     /// <param name="tokens">Список токенов для составления HTML-кода</param>
-    /// <param name="outputLine">HTML-код</param>
-    /// <returns>Удалось ли отрендерить список токенов</returns>
-    bool TryRender(List<Token> tokens, out string outputLine);
+    /// <param name="inputLine">Текст без тегов</param>
+    /// <returns>Строку с HTML-кодами</returns>
+    string TryRender(List<Token> tokens, string inputLine);
 }

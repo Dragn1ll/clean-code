@@ -7,18 +7,16 @@ public class MarkdownProcessor
     private IParser parser;
     private IRenderer renderer;
 
-    public MarkdownProcessor(IParser parser, IRenderer renderer)
+    public MarkdownProcessor()
     {
-        this.parser = parser;
-        this.renderer = renderer;
+        parser = new Parser();
+        renderer = new Renderer();
     }
 
     public string ConvertToHTML(string text)
     {
-        var tmpList = new List<Token>();
-        parser.TryParse(tmpList, ref text);
-        renderer.TryRender(tmpList, out string outputLine);
+        var outputline = renderer.TryRender(parser.TryParse(ref text), text);
 
-        return "<h1>header</h1>";
+        return outputline;
     }
 }
