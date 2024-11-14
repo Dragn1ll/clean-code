@@ -1,2 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Markdown.Classes;
+
+var md = new MarkdownProcessor();
+
+Console.WriteLine(md.ConvertToHTML("#aaa"));

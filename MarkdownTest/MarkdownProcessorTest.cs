@@ -17,4 +17,16 @@ public class MarkdownProcessorTest
 
         Assert.Equal(outputLine, result);
     }
+    [Fact]
+    public void Test2()
+    {
+        var parser = new Parser();
+        var inputLine = "# header";
+        var outputLine = " header";
+        var tokensList = new List<Token>();
+
+        parser.TryParse(tokensList, ref inputLine);
+
+        Assert.Equal(outputLine, inputLine);
+    }
 }
