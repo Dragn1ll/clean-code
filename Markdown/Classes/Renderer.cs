@@ -29,11 +29,13 @@ public class Renderer : IRenderer
 
         for (int i = inputLine.Length - 1; i >= 0; i--)
         {
-            if (lastStartTagIndex >= -1)
+            if (lastStartTagIndex > -1)
             {
                 if (tokensStartIndexSort[lastStartTagIndex].StartIndex == i)
                 {
-                    if (tokensStartIndexSort[lastStartTagIndex].EndIndex != -1)
+                    if (tokensStartIndexSort[lastStartTagIndex].EndIndex != -1 &&
+                        !ThereAreDigits(inputLine, tokensStartIndexSort[lastStartTagIndex].StartIndex, 
+                        tokensStartIndexSort[lastStartTagIndex].EndIndex))
                         stringBuilder.Replace(_styleToMD[tokensStartIndexSort[lastStartTagIndex].Style], 
                             _styleToHtml[tokensStartIndexSort[lastStartTagIndex].Style][0], i,
                             _styleToMD[tokensStartIndexSort[lastStartTagIndex].Style].Length);
@@ -44,7 +46,9 @@ public class Renderer : IRenderer
 
             if (lastEndTagIndex > -1)
             {
-                if (tokensEndIndexSort[lastEndTagIndex].EndIndex == -1)
+                if (tokensEndIndexSort[lastEndTagIndex].EndIndex == -1 ||
+                    ThereAreDigits(inputLine, tokensEndIndexSort[lastEndTagIndex].StartIndex,
+                        tokensEndIndexSort[lastEndTagIndex].EndIndex))
                     lastEndTagIndex--;
                 else if (tokensEndIndexSort[lastEndTagIndex].EndIndex == i)
                 {
@@ -58,5 +62,16 @@ public class Renderer : IRenderer
         }
 
         return stringBuilder.ToString();
+    }
+
+    private bool ThereAreDigits(string line, int start, int end)
+    {
+        for (int i = start; i < end + 1; i++)
+        {
+            if (char.IsDigit(line[i]))
+                return true;
+        }
+
+        return false;
     }
 }
