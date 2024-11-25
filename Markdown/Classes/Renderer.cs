@@ -17,7 +17,7 @@ public class Renderer : IRenderer
         { Style.Header3, "###" }, { Style.Header4, "####" },{ Style.Header5, "#####" }, 
         { Style.Header6, "######" } };
 
-    public string TryRender(List<Token> tokens, string inputLine)
+    public string Render(List<Token> tokens, string inputLine)
     {
         var tokensStartIndexSort = tokens.OrderBy(x => x.StartIndex).ToList();
         var tokensEndIndexSort = tokens.OrderBy(x => x.EndIndex).ToList();
@@ -25,20 +25,26 @@ public class Renderer : IRenderer
         int lastEndTagIndex = tokens.Count - 1;
         int lastStartTagIndex = tokens.Count - 1;
 
+        var stackInputedTokens = new List<Token>();
+
         var stringBuilder = new StringBuilder(inputLine);
 
         for (int i = inputLine.Length - 1; i >= 0; i--)
         {
-            if (lastStartTagIndex > -1)
+            if (lastStartTagIndex > -1 && stackInputedTokens.Count > 0)
             {
                 if (tokensStartIndexSort[lastStartTagIndex].StartIndex == i)
                 {
-                    if (tokensStartIndexSort[lastStartTagIndex].EndIndex != -1 &&
-                        !ThereAreDigits(inputLine, tokensStartIndexSort[lastStartTagIndex].StartIndex, 
+                    if (stackInputedTokens.Contains(tokensStartIndexSort[lastStartTagIndex]) &&
+                        !ThereAreDigits(inputLine, tokensStartIndexSort[lastStartTagIndex].StartIndex,
                         tokensStartIndexSort[lastStartTagIndex].EndIndex))
-                        stringBuilder.Replace(_styleToMD[tokensStartIndexSort[lastStartTagIndex].Style], 
+                    {
+                        stringBuilder.Replace(_styleToMD[tokensStartIndexSort[lastStartTagIndex].Style],
                             _styleToHtml[tokensStartIndexSort[lastStartTagIndex].Style][0], i,
                             _styleToMD[tokensStartIndexSort[lastStartTagIndex].Style].Length);
+
+                        stackInputedTokens.Remove(tokensStartIndexSort[lastStartTagIndex]);
+                    }
 
                     lastStartTagIndex--;
                 }
@@ -50,12 +56,20 @@ public class Renderer : IRenderer
                     ThereAreDigits(inputLine, tokensEndIndexSort[lastEndTagIndex].StartIndex,
                         tokensEndIndexSort[lastEndTagIndex].EndIndex))
                     lastEndTagIndex--;
+
+                else if (stackInputedTokens.Count > 0 && 
+                    tokensEndIndexSort[lastEndTagIndex].Style != stackInputedTokens[stackInputedTokens.Count - 1].Style &&
+                    stackInputedTokens[stackInputedTokens.Count - 1].Style == Style.Italic && 
+                    tokensEndIndexSort[lastEndTagIndex].StartIndex > stackInputedTokens[stackInputedTokens.Count - 1].StartIndex)
+                    
+                    lastEndTagIndex--;
                 else if (tokensEndIndexSort[lastEndTagIndex].EndIndex == i)
                 {
-                    stringBuilder.Replace(_styleToMD[tokensStartIndexSort[lastStartTagIndex].Style],
+                    stringBuilder.Replace(_styleToMD[tokensEndIndexSort[lastEndTagIndex].Style],
                         _styleToHtml[tokensEndIndexSort[lastEndTagIndex].Style][1], i,
-                        _styleToMD[tokensStartIndexSort[lastStartTagIndex].Style].Length);
+                        _styleToMD[tokensEndIndexSort[lastEndTagIndex].Style].Length);
 
+                    stackInputedTokens.Add(tokensEndIndexSort[lastEndTagIndex]);
                     lastEndTagIndex--;
                 }
             }

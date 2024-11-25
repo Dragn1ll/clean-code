@@ -44,7 +44,8 @@ public class Parser : IParser
                             if (startSymbolStack.TryPeek(out Token resultStack) && resultStack.Equal(resultTmpStack))
                                 startSymbolStack.Pop();
                         }
-                        else if (!TryFindTokenEnd(startSymbolStack, tokensBeParsed, style, i, lengthVerifiedWords))
+                        else if (!TryFindTokenEnd(startSymbolStack, endSymbolStack, tokensBeParsed, style,
+                            i, lengthVerifiedWords))
                         {
                             var tmpToken = new Token(i + lengthVerifiedWords, -1, style);
 
@@ -109,12 +110,28 @@ public class Parser : IParser
 
                             stringBuilder.Remove(lastTextIndex, stringBuilder.Length - lastTextIndex);
 
-                            tokensBeParsed.Add(new Token(0, stringBuilder.Length - 1, isAllSpace ?
-                                                                        Style.LineBreak : (Style)firstTextIndex));
+                            if (isAllSpace)
+                                stringBuilder.Append("<br>");
+                            else
+                            {
+                                var tmpLine = stringBuilder.ToString();
+
+                                stringBuilder.Clear();
+                                stringBuilder.Append($"<h{firstTextIndex}>");
+                                stringBuilder.Append(tmpLine);
+                                stringBuilder.Append($"</h{firstTextIndex}>");
+                            }
                         }
                     }
                     else
-                        tokensBeParsed.Add(new Token(0, stringBuilder.Length - 1, (Style)firstTextIndex));
+                    {
+                        var tmpLine = stringBuilder.ToString();
+
+                        stringBuilder.Clear();
+                        stringBuilder.Append($"<h{firstTextIndex}>");
+                        stringBuilder.Append(tmpLine);
+                        stringBuilder.Append($"</h{firstTextIndex}>");
+                    }
                 }
             }
         }
@@ -165,19 +182,13 @@ public class Parser : IParser
         {
             if (startStackTokens.Peek().Style == style)
             {
-                var tmpToken = startStackTokens.Pop();
+                var tmpToken = new Token(index + lengthVerifiedWords, -1, style);
 
-                tmpToken.EndIndex = index + lengthVerifiedWords;
+                startStackTokens.Clear();
+                endStackTokens.Clear();
+
+                tokens.Add(tmpToken);
                 return true;
-            }
-            else
-            {
-                var startStackFirstCount = startStackTokens.Count;
-
-                while (startStackTokens.Count > startStackFirstCount - 2)
-                    tokens.Remove(startStackTokens.Pop());
-
-                tokens.Remove(endStackTokens.Pop());
             }
         }
         else if (startStackTokens.Peek().Style == style &&

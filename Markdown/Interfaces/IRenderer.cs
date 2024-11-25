@@ -10,5 +10,5 @@ public interface IRenderer
     /// <param name="tokens">Список токенов для составления HTML-кода</param>
     /// <param name="inputLine">Текст без тегов</param>
     /// <returns>Строку с HTML-кодами</returns>
-    string TryRender(List<Token> tokens, string inputLine);
+    string Render(List<Token> tokens, string inputLine);
 }
