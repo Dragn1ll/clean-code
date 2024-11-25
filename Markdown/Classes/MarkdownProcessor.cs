@@ -15,7 +15,7 @@ public class MarkdownProcessor
 
     public string ConvertToHTML(string text)
     {
-        var outputline = renderer.TryRender(parser.TryParse(ref text), text);
+        var outputline = renderer.Render(parser.TryParse(ref text), text);
 
         return outputline;
     }

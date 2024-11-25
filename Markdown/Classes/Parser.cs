@@ -13,7 +13,8 @@ public class Parser : IParser
         CheckHeader(tokensBeParsed, ref line);
         
         var words = line.Split(' ');
-        var stack = new Stack<Token>();
+        var startSymbolStack = new Stack<Token>();
+        var endSymbolStack = new Stack<Token>();
         int lengthVerifiedWords = 0;
 
         foreach (var word in words)
@@ -31,34 +32,39 @@ public class Parser : IParser
                         Token tmpToken = new Token(lengthVerifiedWords, -1, style);
 
                         tokensBeParsed.Add(tmpToken);
-                        stack.Push(tmpToken);
+                        startSymbolStack.Push(tmpToken);
                         tmpStack.Push(tmpToken);
-
-                        i += style == Style.Italic ? 0 : 1;
                     }
                     else if (i == word.Length - (style == Style.Italic ? 1 : 2))
                     {
-                        if (!TryFindTokenEnd(tmpStack, style, i, lengthVerifiedWords) 
-                            && !TryFindTokenEnd(stack, style, i, lengthVerifiedWords))
+
+                        if (tmpStack.TryPeek(out Token resultTmpStack) && TryFindTokenEnd(tmpStack, tokensBeParsed,
+                            style, i, lengthVerifiedWords))
+                        {
+                            if (startSymbolStack.TryPeek(out Token resultStack) && resultStack.Equal(resultTmpStack))
+                                startSymbolStack.Pop();
+                        }
+                        else if (!TryFindTokenEnd(startSymbolStack, endSymbolStack, tokensBeParsed, style,
+                            i, lengthVerifiedWords))
                         {
                             var tmpToken = new Token(i + lengthVerifiedWords, -1, style);
 
                             tokensBeParsed.Add(tmpToken);
-                            stack.Push(tmpToken);
+                            endSymbolStack.Push(tmpToken);
                         }
                     }
                     else
                     {
-                        if (!TryFindTokenEnd(tmpStack, style, i, lengthVerifiedWords))
+                        if (!TryFindTokenEnd(tmpStack, tokensBeParsed, style, i, lengthVerifiedWords))
                         {
                             var tmpToken = new Token(i + lengthVerifiedWords, -1, style);
 
                             tokensBeParsed.Add(tmpToken);
-                            stack.Push(tmpToken);
+                            tmpStack.Push(tmpToken);
                         }
-
-                        i += style == Style.Italic ? 0 : 1;
                     }
+
+                    i += style == Style.Italic ? 0 : 1;
                 }
             }
 
@@ -104,12 +110,28 @@ public class Parser : IParser
 
                             stringBuilder.Remove(lastTextIndex, stringBuilder.Length - lastTextIndex);
 
-                            tokensBeParsed.Add(new Token(0, stringBuilder.Length - 1, isAllSpace ?
-                                                                        Style.LineBreak : (Style)firstTextIndex));
+                            if (isAllSpace)
+                                stringBuilder.Append("<br>");
+                            else
+                            {
+                                var tmpLine = stringBuilder.ToString();
+
+                                stringBuilder.Clear();
+                                stringBuilder.Append($"<h{firstTextIndex}>");
+                                stringBuilder.Append(tmpLine);
+                                stringBuilder.Append($"</h{firstTextIndex}>");
+                            }
                         }
                     }
                     else
-                        tokensBeParsed.Add(new Token(0, stringBuilder.Length - 1, (Style)firstTextIndex));
+                    {
+                        var tmpLine = stringBuilder.ToString();
+
+                        stringBuilder.Clear();
+                        stringBuilder.Append($"<h{firstTextIndex}>");
+                        stringBuilder.Append(tmpLine);
+                        stringBuilder.Append($"</h{firstTextIndex}>");
+                    }
                 }
             }
         }
@@ -117,7 +139,8 @@ public class Parser : IParser
         line = stringBuilder.ToString();
     }
 
-    private bool TryFindTokenEnd(Stack<Token> stackTokens, Style style, int index, int lengthVerifiedWords)
+    private bool TryFindTokenEnd(Stack<Token> stackTokens, List<Token> tokens, Style style, int index,
+        int lengthVerifiedWords)
     {
         if (stackTokens.Count == 0)
             return false;
@@ -133,19 +156,45 @@ public class Parser : IParser
             }
             else
             {
-                while (stackTokens.Count > 1)
-                    stackTokens.Pop();
+                while (stackTokens.Count > 0)
+                    tokens.Remove(stackTokens.Pop());
+            }
+        }
+        else if (stackTokens.Peek().Style == style && 
+            stackTokens.Peek().StartIndex < (index + lengthVerifiedWords - 2))
+        {
+            var tmpToken = stackTokens.Pop();
 
-                var tmpToken = stackTokens.Pop();
+            tmpToken.EndIndex = index + lengthVerifiedWords;
+            return true;
+        }
 
-                tmpToken.EndIndex = index + lengthVerifiedWords;
-                tmpToken.Style = Style.Italic;
+        return false;
+    }
+
+    private bool TryFindTokenEnd(Stack<Token> startStackTokens, Stack<Token> endStackTokens, List<Token> tokens, Style style, int index,
+        int lengthVerifiedWords)
+    {
+        if (startStackTokens.Count == 0)
+            return false;
+
+        if (startStackTokens.Count == 2 && endStackTokens.Count == 1)
+        {
+            if (startStackTokens.Peek().Style == style)
+            {
+                var tmpToken = new Token(index + lengthVerifiedWords, -1, style);
+
+                startStackTokens.Clear();
+                endStackTokens.Clear();
+
+                tokens.Add(tmpToken);
                 return true;
             }
         }
-        else if (stackTokens.Peek().Style == style)
+        else if (startStackTokens.Peek().Style == style &&
+            startStackTokens.Peek().StartIndex < (index + lengthVerifiedWords - 2))
         {
-            var tmpToken = stackTokens.Pop();
+            var tmpToken = startStackTokens.Pop();
 
             tmpToken.EndIndex = index + lengthVerifiedWords;
             return true;
