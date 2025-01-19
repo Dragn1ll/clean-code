@@ -1,15 +1,9 @@
-﻿using Markdown.Classes;
+﻿namespace Markdown;
 
-var md = new MarkdownProcessor();
-
-Console.WriteLine(md.ConvertToHTML("Внутри __двойного выделения _одинарное_ тоже__ работает."));
-Console.WriteLine(md.ConvertToHTML("Но не наоборот — внутри _одинарного __двойное__ не_ работает."));
-Console.WriteLine(md.ConvertToHTML("Подчерки внутри текста c цифрами_12_3 не считаются выделением и должны оставаться символами подчерка."));
-Console.WriteLine(md.ConvertToHTML("Однако выделять часть слова они могут: и в _нач_але, и в сер_еди_не, и в кон_це._"));
-Console.WriteLine(md.ConvertToHTML("В то же время выделение в ра_зных сл_овах не работает."));
-Console.WriteLine(md.ConvertToHTML("__Непарные_ символы в рамках одного абзаца не считаются выделением."));
-Console.WriteLine(md.ConvertToHTML("За подчерками, начинающими выделение, должен следовать непробельный символ. Иначе эти_ подчерки_ не считаются выделением \r\nи остаются просто символами подчерка."));
-Console.WriteLine(md.ConvertToHTML("Подчерки, заканчивающие выделение, должны следовать за непробельным символом. Иначе эти _подчерки _не считаются_ окончанием выделения \r\nи остаются просто символами подчерка."));
-Console.WriteLine(md.ConvertToHTML("В случае __пересечения _двойных__ и одинарных_ подчерков ни один из них не считается выделением."));
-Console.WriteLine(md.ConvertToHTML("Если внутри подчерков пустая строка ____, то они остаются символами подчерка."));
-Console.WriteLine(md.ConvertToHTML("#####Заголовок"));
+class Program
+{
+    public static void Main(string[] args)
+    {
+        
+    }
+}

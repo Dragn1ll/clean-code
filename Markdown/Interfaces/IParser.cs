@@ -7,7 +7,7 @@ public interface IParser
     /// <summary>
     /// Метод для парса строки из MD файла в список токенов
     /// </summary>
-    /// <param name="line">текст файла или путь к нему</param>
+    /// <param name="line">Текст файла или путь к нему</param>
     /// <returns>Полученный список токенов</returns>
-    List<Token> TryParse(ref string line);
+    List<Token?> ParseToTokens(ref string line);
 }

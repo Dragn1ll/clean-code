@@ -10,5 +10,6 @@ public enum Style
     Header6 = 6,
     Bold,
     Italic,
-    LineBreak
+    LineBreak,
+    Shielding
 }

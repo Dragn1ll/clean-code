@@ -15,7 +15,7 @@ public class Token
         Style = style;
     }
 
-    public bool Equal(Token token)
+    public bool Equal(Token? token)
     {
         return StartIndex == token.StartIndex && Style == token.Style;
     }

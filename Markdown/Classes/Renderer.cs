@@ -6,83 +6,103 @@ namespace Markdown.Classes;
 
 public class Renderer : IRenderer
 {
-    private static Dictionary<Style, string[]> _styleToHtml = new Dictionary<Style, string[]> {
-        { Style.Italic, new string[]{ "<em>", "</em>" } }, { Style.Bold, new  string[] { "<strong>", "</strong>" } }, 
-        { Style.Header1, new  string[]{ "<h1>", "</h1>" } }, { Style.Header2, new string[] { "<h2>", "</h2>" } },
-        { Style.Header3, new string[] { "<h3>", "</h3>" } }, { Style.Header4, new string[] { "<h4>", "</h4>" } },
-        { Style.Header5, new string[] { "<h5>", "</h5>" } }, { Style.Header6, new string[] { "<h6>", "</h6>" } } };
+    private static readonly Dictionary<Style, string[]> StyleToHtml = new(){
+        { Style.Italic, ["<em>", "</em>"] }, { Style.Bold, ["<strong>", "</strong>"] }, 
+        { Style.Header1, ["<h1>", "</h1>"] }, { Style.Header2, ["<h2>", "</h2>"] },
+        { Style.Header3, ["<h3>", "</h3>"] }, { Style.Header4, ["<h4>", "</h4>"] },
+        { Style.Header5, ["<h5>", "</h5>"] }, { Style.Header6, ["<h6>", "</h6>"] },
+        { Style.Shielding, [""] }
+    };
 
-    private static Dictionary<Style, string> _styleToMD = new Dictionary<Style, string> {
+    private static readonly Dictionary<Style, string> StyleToMd = new(){
         { Style.Italic, "_" }, { Style.Bold, "__" },{ Style.Header1, "#" }, { Style.Header2, "##" },
         { Style.Header3, "###" }, { Style.Header4, "####" },{ Style.Header5, "#####" }, 
-        { Style.Header6, "######" } };
+        { Style.Header6, "######" }, { Style.Shielding, "\\"} };
 
-    public string Render(List<Token> tokens, string inputLine)
+    public string Render(List<Token?> tokens, string inputLine)
     {
-        var tokensStartIndexSort = tokens.OrderBy(x => x.StartIndex).ToList();
-        var tokensEndIndexSort = tokens.OrderBy(x => x.EndIndex).ToList();
+        if (tokens.Count == 0)
+            return inputLine;
+        
+        var tokensStartIndexSort = tokens.OrderBy(x => x!.StartIndex)
+                                                    .Where(x => x!.StartIndex != -1)
+                                                    .ToList();
+        var tokensEndIndexSort = tokens.OrderBy(x => x!.EndIndex)
+                                                    .ToList();
 
-        int lastEndTagIndex = tokens.Count - 1;
-        int lastStartTagIndex = tokens.Count - 1;
+        var lastEndTagIndex = tokensEndIndexSort.Count - 1;
+        var lastStartTagIndex = tokensStartIndexSort.Count - 1;
 
-        var stackInputedTokens = new List<Token>();
+        var listInputTokens = new List<Token?>();
 
         var stringBuilder = new StringBuilder(inputLine);
 
-        for (int i = inputLine.Length - 1; i >= 0; i--)
+        for (var index = inputLine.Length - 1; index >= 0; index--)
         {
-            if (lastStartTagIndex > -1 && stackInputedTokens.Count > 0)
+            if (lastStartTagIndex > -1 && listInputTokens.Count > 0)
             {
-                if (tokensStartIndexSort[lastStartTagIndex].StartIndex == i)
+                var tokenStartIndex = tokensStartIndexSort[lastStartTagIndex];
+                
+                if (tokenStartIndex!.StartIndex == index)
                 {
-                    if (stackInputedTokens.Contains(tokensStartIndexSort[lastStartTagIndex]) &&
-                        !ThereAreDigits(inputLine, tokensStartIndexSort[lastStartTagIndex].StartIndex,
-                        tokensStartIndexSort[lastStartTagIndex].EndIndex))
+                    if (!ThereAreDigits(inputLine, tokenStartIndex.StartIndex, tokenStartIndex.EndIndex) 
+                        && listInputTokens.Contains(tokenStartIndex))
                     {
-                        stringBuilder.Replace(_styleToMD[tokensStartIndexSort[lastStartTagIndex].Style],
-                            _styleToHtml[tokensStartIndexSort[lastStartTagIndex].Style][0], i,
-                            _styleToMD[tokensStartIndexSort[lastStartTagIndex].Style].Length);
+                        stringBuilder.Replace(StyleToMd[tokenStartIndex.Style],
+                            StyleToHtml[tokenStartIndex.Style][0], index,
+                            StyleToMd[tokenStartIndex.Style].Length);
 
-                        stackInputedTokens.Remove(tokensStartIndexSort[lastStartTagIndex]);
+                        listInputTokens.Remove(tokenStartIndex);
                     }
 
                     lastStartTagIndex--;
                 }
             }
 
-            if (lastEndTagIndex > -1)
+            if (lastEndTagIndex <= -1) continue;
+            
+            var tokenEndIndex = tokensEndIndexSort[lastEndTagIndex];
+            
+            if (tokenEndIndex!.EndIndex == index && tokenEndIndex.Style == Style.Shielding)
             {
-                if (tokensEndIndexSort[lastEndTagIndex].EndIndex == -1 ||
-                    ThereAreDigits(inputLine, tokensEndIndexSort[lastEndTagIndex].StartIndex,
-                        tokensEndIndexSort[lastEndTagIndex].EndIndex))
-                    lastEndTagIndex--;
+                stringBuilder.Replace(StyleToMd[tokenEndIndex.Style],
+                    StyleToHtml[tokenEndIndex.Style][0], index,
+                    StyleToMd[tokenEndIndex.Style].Length);
+                
+                lastEndTagIndex--;
+            }
+            
+            else if (tokenEndIndex!.StartIndex > -1 
+                     && ThereAreDigits(inputLine, tokenEndIndex.StartIndex, tokenEndIndex.EndIndex))
+                lastEndTagIndex--;
 
-                else if (stackInputedTokens.Count > 0 && 
-                    tokensEndIndexSort[lastEndTagIndex].Style != stackInputedTokens[stackInputedTokens.Count - 1].Style &&
-                    stackInputedTokens[stackInputedTokens.Count - 1].Style == Style.Italic && 
-                    tokensEndIndexSort[lastEndTagIndex].StartIndex > stackInputedTokens[stackInputedTokens.Count - 1].StartIndex)
-                    
-                    lastEndTagIndex--;
-                else if (tokensEndIndexSort[lastEndTagIndex].EndIndex == i)
-                {
-                    stringBuilder.Replace(_styleToMD[tokensEndIndexSort[lastEndTagIndex].Style],
-                        _styleToHtml[tokensEndIndexSort[lastEndTagIndex].Style][1], i,
-                        _styleToMD[tokensEndIndexSort[lastEndTagIndex].Style].Length);
+            else if (listInputTokens.Count > 0
+                     && tokenEndIndex.Style != listInputTokens[^1]!.Style
+                     && listInputTokens[^1] is { Style: Style.Italic }
+                     && tokenEndIndex.StartIndex > listInputTokens[^1]!.StartIndex)
+            {
+                lastEndTagIndex--;
+            }
+            
+            else if (tokenEndIndex.EndIndex == index )
+            {
+                stringBuilder.Replace(StyleToMd[tokenEndIndex.Style],
+                    StyleToHtml[tokenEndIndex.Style][1], index,
+                    StyleToMd[tokenEndIndex.Style].Length);
 
-                    stackInputedTokens.Add(tokensEndIndexSort[lastEndTagIndex]);
-                    lastEndTagIndex--;
-                }
+                listInputTokens.Add(tokenEndIndex);
+                lastEndTagIndex--;
             }
         }
 
         return stringBuilder.ToString();
     }
 
-    private bool ThereAreDigits(string line, int start, int end)
+    private static bool ThereAreDigits(string line, int start, int end)
     {
-        for (int i = start; i < end + 1; i++)
+        for (var index = start; index < end + 1; index++)
         {
-            if (char.IsDigit(line[i]))
+            if (char.IsDigit(line[index]))
                 return true;
         }
 
