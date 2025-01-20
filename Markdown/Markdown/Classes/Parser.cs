@@ -1,6 +1,6 @@
 ﻿using Markdown.Interfaces;
-using Markdown.Enums;
 using System.Text;
+using Markdown.Enums;
 
 namespace Markdown.Classes;
 
@@ -10,7 +10,7 @@ public class Parser : IParser
     {   
         var tokensBeParsed = new List<Token?>();
 
-        CheckHeader(tokensBeParsed, ref line);
+        line = CheckHeader(tokensBeParsed, line);
         
         var words = line.Split(' ');
         var startSymbolStack = new Stack<Token?>();
@@ -48,7 +48,7 @@ public class Parser : IParser
                             style, index, lengthVerifiedWords))
                     {
                         if (startSymbolStack.TryPeek(out var resultStack) && resultStack != null 
-                                                                          && resultStack.Equal(resultTmpStack))
+                                                                          && resultStack.Equals(resultTmpStack))
                             startSymbolStack.Pop();
                     }
                     else if (!TryFindTokenEnd(startSymbolStack, endSymbolStack, tokensBeParsed, style,
@@ -80,7 +80,7 @@ public class Parser : IParser
         return tokensBeParsed.Where(x => x!.EndIndex != -1).ToList();
     }
 
-    private static void CheckHeader(List<Token?> tokensBeParsed, ref string line)
+    private static string CheckHeader(List<Token?> tokensBeParsed, string line)
     {
         var stringBuilder = new StringBuilder(line);
 
@@ -142,7 +142,7 @@ public class Parser : IParser
             }
         }
 
-        line = stringBuilder.ToString();
+        return stringBuilder.ToString();
     }
 
     private static bool TryFindTokenEnd(Stack<Token?> stackTokens, List<Token?> tokens, Style style, 
@@ -190,7 +190,7 @@ public class Parser : IParser
         {
             case 0:
                 return false;
-            case 2 when endStackTokens.Count == 1 && startStackTokens.Peek()!.Style == style && startStackTokens.Peek()!.Style == style:
+            case 2 when endStackTokens.Count == 1 && startStackTokens.Peek()!.Style == style:
             {
                 var tmpToken = new Token(index + lengthVerifiedWords, -1, style);
 

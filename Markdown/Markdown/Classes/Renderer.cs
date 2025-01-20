@@ -1,6 +1,6 @@
-﻿using Markdown.Enums;
-using Markdown.Interfaces;
+﻿using Markdown.Interfaces;
 using System.Text;
+using Markdown.Enums;
 
 namespace Markdown.Classes;
 
@@ -49,7 +49,7 @@ public class Renderer : IRenderer
                         && listInputTokens.Contains(tokenStartIndex))
                     {
                         stringBuilder.Replace(StyleToMd[tokenStartIndex.Style],
-                            StyleToHtml[tokenStartIndex.Style][0], index,
+                            StyleToHtml[tokenStartIndex.Style][0], tokenStartIndex.StartIndex,
                             StyleToMd[tokenStartIndex.Style].Length);
 
                         listInputTokens.Remove(tokenStartIndex);
@@ -63,16 +63,16 @@ public class Renderer : IRenderer
             
             var tokenEndIndex = tokensEndIndexSort[lastEndTagIndex];
             
-            if (tokenEndIndex!.EndIndex == index && tokenEndIndex.Style == Style.Shielding)
+            if (tokenEndIndex!.Style == Style.Shielding)
             {
                 stringBuilder.Replace(StyleToMd[tokenEndIndex.Style],
-                    StyleToHtml[tokenEndIndex.Style][0], index,
+                    StyleToHtml[tokenEndIndex.Style][0], tokenEndIndex.EndIndex,
                     StyleToMd[tokenEndIndex.Style].Length);
                 
                 lastEndTagIndex--;
             }
             
-            else if (tokenEndIndex!.StartIndex > -1 
+            else if (tokenEndIndex.StartIndex > -1 
                      && ThereAreDigits(inputLine, tokenEndIndex.StartIndex, tokenEndIndex.EndIndex))
                 lastEndTagIndex--;
 
