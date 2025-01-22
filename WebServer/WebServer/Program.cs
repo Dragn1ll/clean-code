@@ -16,7 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<WebDbContext>(
     options =>
     {
-        options.UseNpgsql(builder.Configuration.GetConnectionString("WebDbContext"));
+        options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(WebDbContext)));
     });
 
 var app = builder.Build();

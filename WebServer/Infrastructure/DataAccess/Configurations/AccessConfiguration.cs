@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Configurations;
 
-public class UsersPermissionsConfiguration : IEntityTypeConfiguration<UsersPermissionsEntity>
+public class AccessConfiguration : IEntityTypeConfiguration<AccessEntity>
 {
-    public void Configure(EntityTypeBuilder<UsersPermissionsEntity> builder)
+    public void Configure(EntityTypeBuilder<AccessEntity> builder)
     {
         builder
             .HasOne(up => up.User)

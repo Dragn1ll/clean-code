@@ -1,6 +1,6 @@
 namespace Infrastructure.DataAccess.Entities;
 
-public class UsersPermissionsEntity
+public class AccessEntity
 {
     public Guid UserId { get; set; }
     public UserEntity User { get; set; } = new UserEntity();
