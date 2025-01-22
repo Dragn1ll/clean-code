@@ -1,6 +1,4 @@
-using Core.Entities;
-
-namespace Application.Interfaces;
+namespace Application.Interfaces.Services;
 
 public interface IMinioService
 {

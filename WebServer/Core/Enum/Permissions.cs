@@ -2,8 +2,8 @@ namespace Core.Enum;
 
 public enum Permissions
 {
-    Read = 1,
-    Write = 2,
-    Rename = 3,
-    Delete = 4
+    NoAccess = 1,
+    Read = 2,
+    Write = 3,
+    Master = 4
 }

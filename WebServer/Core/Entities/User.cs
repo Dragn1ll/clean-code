@@ -2,9 +2,9 @@ using Core.Enum;
 
 namespace Core.Entities;
 
-public class User(long id, string name, string email, string password, Role role)
+public class User(Guid id, string name, string email, string password, Role role)
 {
-    public long Id { get; } = id;
+    public Guid Id { get; } = id;
     public string Name { get; } = name;
     public string Email { get; } = email;
     public string Password { get; } = password;
