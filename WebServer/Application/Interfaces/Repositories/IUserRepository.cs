@@ -1,6 +1,6 @@
 using Application.Dto;
-using Core.Entities;
 using Core.Enum;
+using Core.Models;
 
 namespace Application.Interfaces.Repositories;
 

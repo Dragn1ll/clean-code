@@ -1,6 +1,6 @@
 using Core.Enum;
 
-namespace Core.Entities;
+namespace Core.Models;
 
 public class User(Guid id, string name, string email, string password, Role role)
 {

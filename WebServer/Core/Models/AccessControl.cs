@@ -1,6 +1,6 @@
 using Core.Enum;
 
-namespace Core.Entities;
+namespace Core.Models;
 
 public class AccessControl(Guid userId, Guid documentId, Permissions permissions)
 {

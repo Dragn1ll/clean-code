@@ -1,4 +1,4 @@
-namespace Core.Entities;
+namespace Core.Models;
 
 public class MdDocument(Guid id, Guid masterId, string title, DateTime creationDate)
 {
