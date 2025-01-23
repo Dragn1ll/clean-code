@@ -2,9 +2,9 @@ using Core.Models;
 
 namespace Application.Interfaces.Repositories;
 
-public interface IDocumentRepository
+public interface IDocumentsRepository
 {
-    Task<Result> Create(Guid userId, string title);
+    Task<Result<Guid>> Create(Guid userId, string title);
     Task<Result> Delete(Guid documentId);
     Task<Result> Rename(Guid documentId, string newTitle);
     Task<Result<MdDocument>> GetById(Guid documentId);

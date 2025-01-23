@@ -6,25 +6,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataAccess.Repositories;
 
-public class DocumentsRepository(WebDbContext dbContext) : IDocumentRepository
+public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
 {
-    public async Task<Result> Create(Guid userId, string title)
+    public async Task<Result<Guid>> Create(Guid userId, string title)
     {
         try
         {
-            await dbContext.Documents.AddAsync(new DocumentEntity
+            var documentEntity = new DocumentEntity
             {
                 Id = Guid.NewGuid(),
                 Title = title,
                 AuthorId = userId
-            });
+            };
+            
+            await dbContext.Documents.AddAsync(documentEntity);
             await dbContext.SaveChangesAsync();
         
-            return Result.Success();
+            return Result<Guid>.Success(documentEntity.Id);
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result<Guid>.Failure(exception);
         }
     }
 

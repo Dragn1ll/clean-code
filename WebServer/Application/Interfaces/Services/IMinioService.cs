@@ -2,7 +2,8 @@ namespace Application.Interfaces.Services;
 
 public interface IMinioService
 {
-    Task<Result<bool>> CreateDocument(long documentId);
-    Task<Result<string>> PullDocument(long documentId); 
-    Task<Result<bool>> PushDocument(long documentId, string content);
+    Task<Result> CreateDocument(Guid documentId);
+    Task<Result<string>> PullDocument(Guid documentId); 
+    Task<Result> PushDocument(Guid documentId, string content);
+    Task<Result> DeleteDocument(Guid documentId);
 }
