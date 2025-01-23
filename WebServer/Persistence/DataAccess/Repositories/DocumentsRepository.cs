@@ -1,10 +1,10 @@
 using Application;
 using Application.Interfaces.Repositories;
 using Core.Models;
-using Infrastructure.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+using Persistence.DataAccess.Entities;
 
-namespace Infrastructure.DataAccess.Repositories;
+namespace Persistence.DataAccess.Repositories;
 
 public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
 {

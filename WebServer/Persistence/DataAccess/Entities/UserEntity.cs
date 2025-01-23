@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace Infrastructure.DataAccess.Entities;
+namespace Persistence.DataAccess.Entities;
 
 public class UserEntity
 {

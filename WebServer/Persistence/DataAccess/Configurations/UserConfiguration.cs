@@ -1,8 +1,8 @@
-using Infrastructure.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.DataAccess.Entities;
 
-namespace Infrastructure.DataAccess.Configurations;
+namespace Persistence.DataAccess.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
 {

@@ -1,7 +1,8 @@
-namespace Infrastructure.DataAccess.Entities;
+namespace Persistence.DataAccess.Entities;
 
 public class AccessEntity
 {
+    public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public UserEntity User { get; set; } = new UserEntity();
     public int PermissionId { get; set; }

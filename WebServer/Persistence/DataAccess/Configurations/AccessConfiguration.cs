@@ -1,13 +1,15 @@
-using Infrastructure.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.DataAccess.Entities;
 
-namespace Infrastructure.DataAccess.Configurations;
+namespace Persistence.DataAccess.Configurations;
 
 public class AccessConfiguration : IEntityTypeConfiguration<AccessEntity>
 {
     public void Configure(EntityTypeBuilder<AccessEntity> builder)
     {
+        builder.HasKey(up => up.Id);
+        
         builder
             .HasOne(up => up.User)
             .WithMany(u => u.AssignedPermissions)

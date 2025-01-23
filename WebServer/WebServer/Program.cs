@@ -1,4 +1,4 @@
-using Infrastructure.DataAccess;
+using Persistence.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

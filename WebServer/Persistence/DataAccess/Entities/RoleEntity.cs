@@ -1,4 +1,4 @@
-namespace Infrastructure.DataAccess.Entities;
+namespace Persistence.DataAccess.Entities;
 
 public class RoleEntity
 {

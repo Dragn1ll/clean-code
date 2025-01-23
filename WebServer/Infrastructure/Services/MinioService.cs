@@ -26,13 +26,13 @@ public class MinioService : IMinioService
     {
         try
         {
-            bool bucketExists = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_minioConfig.BucketName));
+            var bucketExists = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_minioConfig.BucketName));
             if (!bucketExists)
             {
                 await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(_minioConfig.BucketName));
             }
 
-            string objectName = $"{documentId}.txt";
+            var objectName = $"{documentId}.txt";
 
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(string.Empty));
             await _minioClient.PutObjectAsync(new PutObjectArgs()
@@ -54,8 +54,8 @@ public class MinioService : IMinioService
     {
         try
         {
-            string objectName = $"{documentId}.txt";
-            string content = string.Empty;
+            var objectName = $"{documentId}.txt";
+            var content = string.Empty;
 
             await _minioClient.GetObjectAsync(new GetObjectArgs()
                 .WithBucket(_minioConfig.BucketName)
@@ -78,7 +78,7 @@ public class MinioService : IMinioService
     {
         try
         {
-            string objectName = $"{documentId}.txt";
+            var objectName = $"{documentId}.txt";
 
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
             await _minioClient.PutObjectAsync(new PutObjectArgs()
@@ -100,7 +100,7 @@ public class MinioService : IMinioService
     {
         try
         {
-            string objectName = $"{documentId}.txt";
+            var objectName = $"{documentId}.txt";
 
             await _minioClient.RemoveObjectAsync(new RemoveObjectArgs()
                 .WithBucket(_minioConfig.BucketName)

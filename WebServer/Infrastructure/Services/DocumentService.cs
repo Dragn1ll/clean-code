@@ -13,8 +13,6 @@ public class DocumentService(
     IOptions<MinioOptions> minioConfig)
     : IDocumentService
 {
-    private readonly MinioOptions _minioConfig = minioConfig.Value;
-
     public async Task<Result> Create(Guid userId, string title)
     {
         var result = await documentsRepository.Create(userId, title);

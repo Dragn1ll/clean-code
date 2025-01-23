@@ -1,8 +1,8 @@
-using Infrastructure.DataAccess.Configurations;
-using Infrastructure.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+using Persistence.DataAccess.Configurations;
+using Persistence.DataAccess.Entities;
 
-namespace Infrastructure.DataAccess;
+namespace Persistence.DataAccess;
 
 public class WebDbContext(DbContextOptions<WebDbContext> options) : DbContext(options)
 {
