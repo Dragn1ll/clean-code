@@ -1,4 +1,4 @@
-namespace Application;
+namespace Application.Utilis;
 
 public class Result(bool isSuccess, Exception? error = null)
 {

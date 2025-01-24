@@ -1,12 +1,12 @@
 using System.Text;
-using Application;
 using Application.Interfaces.Services;
+using Application.Utilis;
 using Infrastructure.Services.Options;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
 
-namespace Infrastructure.Services;
+namespace Application.Services;
 
 public class MinioService : IMinioService
 {

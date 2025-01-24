@@ -1,15 +1,16 @@
-using Application;
-using Application.Interfaces.Services;
-using Core.Models;
 using Application.Interfaces.Repositories;
+using Application.Interfaces.Services;
+using Application.Utilis;
+using Core.Models;
+using Infrastructure.Services;
 using Infrastructure.Services.Options;
 using Microsoft.Extensions.Options;
 
-namespace Infrastructure.Services;
+namespace Application.Services;
 
 public class DocumentService(
     IDocumentsRepository documentsRepository,
-    MinioService minioService,
+    IMinioService minioService,
     IOptions<MinioOptions> minioConfig)
     : IDocumentService
 {

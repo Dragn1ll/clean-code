@@ -1,3 +1,5 @@
+using Application.Utilis;
+
 namespace Application.Interfaces.Services;
 
 public interface IMinioService

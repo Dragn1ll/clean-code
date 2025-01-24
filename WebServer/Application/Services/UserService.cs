@@ -1,11 +1,11 @@
-using Application;
 using Application.Interfaces.Auth;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
+using Application.Utilis;
 using Core.Enum;
 using Core.Models;
 
-namespace Infrastructure.Services;
+namespace Application.Services;
 
 public class UserService(IUsersRepository usersRepository, IPasswordHasher passwordHasher, IJwtWorker jwtWorker)
     : IUserService
