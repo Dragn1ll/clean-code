@@ -1,6 +1,7 @@
 using System.Text;
 using Application.Interfaces.Services;
 using Application.Utils;
+using Core.Enum;
 using Infrastructure.Services.Options;
 using Microsoft.Extensions.Options;
 using Minio;
@@ -46,7 +47,7 @@ public class MinioService : IMinioService
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -70,7 +71,7 @@ public class MinioService : IMinioService
         }
         catch (Exception exception)
         {
-            return Result<string>.Failure(exception);
+            return Result<string>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -92,7 +93,7 @@ public class MinioService : IMinioService
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
     
@@ -110,7 +111,7 @@ public class MinioService : IMinioService
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 }

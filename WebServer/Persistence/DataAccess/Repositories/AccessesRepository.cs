@@ -1,4 +1,3 @@
-using Application;
 using Application.Interfaces.Repositories;
 using Application.Utils;
 using Core.Enum;
@@ -22,7 +21,7 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
         }
         catch (Exception exception)
         {
-            return Result<AccessControl>.Failure(exception);
+            return Result<AccessControl>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -42,7 +41,7 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -59,7 +58,7 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -84,7 +83,7 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
         }
         catch (Exception exception)
         {
-            return Result<IEnumerable<User>>.Failure(exception);
+            return Result<IEnumerable<User>>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -109,7 +108,7 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
         }
         catch (Exception exception)
         {
-            return Result<IEnumerable<User>>.Failure(exception);
+            return Result<IEnumerable<User>>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -134,7 +133,7 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
         }
         catch (Exception exception)
         {
-            return Result<IEnumerable<User>>.Failure(exception);
+            return Result<IEnumerable<User>>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 }

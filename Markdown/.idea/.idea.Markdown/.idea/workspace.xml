@@ -9,26 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1a534735-ac62-48ac-9a7e-17e773457c57" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Markdown/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Markdown/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Markdown.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Markdown/Classes/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/Classes/Parser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MarkdownTest/MarkdownProcessorShouldTest.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MarkdownTest/MarkdownTest.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Repositories/IAccessRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Repositories/IAccessRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Repositories/IDocumentsRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Repositories/IDocumentsRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Repositories/IUsersRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Repositories/IUsersRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IDocumentService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IDocumentService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IMinioService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IMinioService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IUserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IUserService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Services/DocumentService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Services/DocumentService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Services/MinioService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Services/MinioService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Services/UserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Services/UserService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Utilis/Result.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Utils/Result.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/AccessesRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/AccessesRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/DocumentsRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/DocumentsRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/UsersRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/UsersRepository.cs" afterDir="false" />
-    </list>
+    <list default="true" id="1a534735-ac62-48ac-9a7e-17e773457c57" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,6 +23,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/46a322d26154b982566e1817203e5452c91223f93b0e392d9c5b4806696fdc1/Assert.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/abdul/Homework/clean-code/Markdown/Markdown/Classes/Parser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/WebServer/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/WebServer/Views/Shared/_Layout.cshtml" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="SKIP_HIGHLIGHTING" />
   </component>
@@ -149,7 +131,7 @@
       <workItem from="1737357208798" duration="80000" />
       <workItem from="1737357376878" duration="957000" />
       <workItem from="1737742087938" duration="4787000" />
-      <workItem from="1737747044000" duration="938000" />
+      <workItem from="1737747044000" duration="1431000" />
     </task>
     <task id="LOCAL-00001" summary="сделал из консольного приложения библиотеку и изменил тесты, а также внёс некоторые поправки исходя из ревью">
       <option name="closed" value="true" />
@@ -159,7 +141,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737357276946</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="added some work api with user(register) and added url tag in markdownProcessor">
+      <option name="closed" value="true" />
+      <created>1737748285460</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1737748285461</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -170,51 +160,7 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="сделал из консольного приложения библиотеку и изменил тесты, а также внёс некоторые поправки исходя из ревью" />
-    <option name="LAST_COMMIT_MESSAGE" value="сделал из консольного приложения библиотеку и изменил тесты, а также внёс некоторые поправки исходя из ревью" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Markdown/Classes/Parser.cs</url>
-          <line>13</line>
-          <properties documentPath="C:\Users\abdul\Homework\clean-code\Markdown\Markdown\Classes\Parser.cs" containingFunctionPresentation="Method 'ParseToTokens'">
-            <startOffsets>
-              <option value="302" />
-            </startOffsets>
-            <endOffsets>
-              <option value="324" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Markdown/Classes/Parser.cs</url>
-          <line>161</line>
-          <properties documentPath="C:\Users\abdul\Homework\clean-code\Markdown\Markdown\Classes\Parser.cs" containingFunctionPresentation="Method 'CheckUrl'">
-            <startOffsets>
-              <option value="6151" />
-            </startOffsets>
-            <endOffsets>
-              <option value="6257" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Markdown/Classes/Parser.cs</url>
-          <line>169</line>
-          <properties documentPath="C:\Users\abdul\Homework\clean-code\Markdown\Markdown\Classes\Parser.cs" containingFunctionPresentation="Method 'CheckUrl'">
-            <startOffsets>
-              <option value="6532" />
-            </startOffsets>
-            <endOffsets>
-              <option value="6567" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="added some work api with user(register) and added url tag in markdownProcessor" />
+    <option name="LAST_COMMIT_MESSAGE" value="added some work api with user(register) and added url tag in markdownProcessor" />
   </component>
 </project>

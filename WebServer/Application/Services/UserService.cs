@@ -12,8 +12,12 @@ public class UserService(IUsersRepository usersRepository, IPasswordHasher passw
 {
     public async Task<Result> Register(string userName, string email, string password)
     {
-        var passwordHash = passwordHasher.Hash(password);
-        var user = new User(Guid.NewGuid(), userName, email, passwordHash);
+        var checkEmail = await usersRepository.GetByEmail(email);
+        if (checkEmail is { IsSuccess: true, Value: not null })
+            return Result.Failure(new Error(ErrorType.BadRequest, 
+                "Пользователь с таким email уже существует!"));
+        
+        var user = new User(Guid.NewGuid(), userName, email, password);
         
         return await usersRepository.Create(user);
     }
@@ -22,13 +26,14 @@ public class UserService(IUsersRepository usersRepository, IPasswordHasher passw
     {
         var getResult = await usersRepository.GetByEmail(email); 
         if (!getResult.IsSuccess)
-            return Result<string>.Failure(getResult.Error);
+            return Result<string>.Failure(new Error(ErrorType.BadRequest, 
+                "Не существует аккаунта с таким email!"));
         
         var user = getResult.Value;
-        var passwordIsValid = passwordHasher.Validate(user!.Password, password);
+        var passwordIsValid = passwordHasher.Validate(password, user!.Password);
 
         if (!passwordIsValid)
-            return Result<string>.Failure(new ArgumentException("Invalid password"));
+            return Result<string>.Failure(new Error(ErrorType.BadRequest, "Неправильный пароль!"));
 
         var token = jwtWorker.GenerateToken(user);
         return Result<string>.Success(token);

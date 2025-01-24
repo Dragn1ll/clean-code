@@ -1,6 +1,7 @@
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Utils;
+using Core.Enum;
 using Core.Models;
 using Infrastructure.Services;
 using Infrastructure.Services.Options;
@@ -28,7 +29,7 @@ public class DocumentService(
         catch (Exception exception)
         {
             await documentsRepository.Delete(result.Value);
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
         
         return Result.Success();
@@ -46,7 +47,7 @@ public class DocumentService(
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
         
         return Result.Success();

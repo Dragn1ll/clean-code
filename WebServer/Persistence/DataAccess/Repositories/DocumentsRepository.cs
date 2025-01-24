@@ -1,6 +1,7 @@
 using Application;
 using Application.Interfaces.Repositories;
 using Application.Utils;
+using Core.Enum;
 using Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Persistence.DataAccess.Entities;
@@ -27,7 +28,7 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
         }
         catch (Exception exception)
         {
-            return Result<Guid>.Failure(exception);
+            return Result<Guid>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -43,7 +44,7 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -60,7 +61,7 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -77,7 +78,7 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
         }
         catch (Exception exception)
         {
-            return Result<MdDocument>.Failure(exception);
+            return Result<MdDocument>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -93,7 +94,7 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
         }
         catch (Exception exception)
         {
-            return Result<bool>.Failure(exception);
+            return Result<bool>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -118,7 +119,7 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
         }
         catch (Exception exception)
         {
-            return Result<IEnumerable<MdDocument>>.Failure(exception);
+            return Result<IEnumerable<MdDocument>>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 

@@ -22,7 +22,7 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
         }
         catch (Exception exception)
         {
-            return Result<bool>.Failure(exception);
+            return Result<bool>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -44,7 +44,7 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
         }
         catch (Exception exception)
         {
-            return Result.Failure(exception);
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -61,7 +61,7 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
         }
         catch (Exception exception)
         {
-            return Result<User>.Failure(exception);
+            return Result<User>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -78,7 +78,7 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
         }
         catch (Exception exception)
         {
-            return Result<User>.Failure(exception);
+            return Result<User>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 
@@ -94,7 +94,7 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
         }
         catch (Exception exception)
         {
-            return Result<Role>.Failure(exception);
+            return Result<Role>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 }

@@ -8,9 +8,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Auth;
 
-public class JwtWorker(IOptions<AuthOptions> options) : IJwtWorker
+public class JwtWorker(IOptions<JwtOptions> options) : IJwtWorker
 {
-    private readonly AuthOptions _options = options.Value;
+    private readonly JwtOptions _options = options.Value;
 
     public string GenerateToken(User user)
     {

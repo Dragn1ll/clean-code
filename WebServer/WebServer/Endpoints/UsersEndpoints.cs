@@ -1,5 +1,6 @@
 using Application.Interfaces.Services;
 using WebServer.Contracts.Users;
+using WebServer.Switches;
 
 namespace WebServer.Endpoints;
 
@@ -18,10 +19,7 @@ public static class UsersEndpoints
     {
         var registerResult = await userService.Register(request.Name, request.Email, request.Password);
         
-        if (!registerResult.IsSuccess)
-            return Results.BadRequest(registerResult.Error!.Message);
-        
-        return Results.Ok();
+        return registerResult.IsSuccess ? Results.Ok() : ErrorSwitcher.SwitchError(registerResult.Error!);
     }
 
     private static async Task<IResult> Login(LoginUserRequest request, IUserService userService, 
@@ -29,7 +27,7 @@ public static class UsersEndpoints
     {
         var loginResult = await userService.Login(request.Email, request.Password);
 
-        if (!loginResult.IsSuccess) return Results.BadRequest("Неправильный пароль!");
+        if (!loginResult.IsSuccess) return ErrorSwitcher.SwitchError(loginResult.Error!);
         
         context.Response.Cookies.Append("", loginResult.Value!);
         
