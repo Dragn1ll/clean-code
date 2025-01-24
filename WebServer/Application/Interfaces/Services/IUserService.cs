@@ -1,4 +1,4 @@
-using Application.Utilis;
+using Application.Utils;
 using Core.Enum;
 
 namespace Application.Interfaces.Services;

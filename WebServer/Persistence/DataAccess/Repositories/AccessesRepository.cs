@@ -1,6 +1,6 @@
 using Application;
 using Application.Interfaces.Repositories;
-using Application.Utilis;
+using Application.Utils;
 using Core.Enum;
 using Core.Models;
 using Microsoft.EntityFrameworkCore;

@@ -31,6 +31,24 @@ public class MarkdownProcessorShouldTest
 
         Assert.That(output, Is.EqualTo(expected));
     }
+    
+    [TestCase("\\_экранирование_", "_экранирование_")]
+    [TestCase("\\__экранирование__", "__экранирование__")]
+    public void ConvertToHtml_ShouldOutputTagsWithoutStyle(string input, string expected)
+    {
+        var output = _markdownProcessor.ConvertToHtml(input);
+
+        Assert.That(output, Is.EqualTo(expected));
+    }
+    
+    [TestCase("[ссылка]()", "<a href=\"#\">ссылка</a>")]
+    [TestCase("[ссылка](www.google.com)", "<a href=\"www.google.com\">ссылка</a>")]
+    public void ConvertToHtml_ShouldOutputUrl(string input, string expected)
+    {
+        var output = _markdownProcessor.ConvertToHtml(input);
+
+        Assert.That(output, Is.EqualTo(expected));
+    }
 
     [TestCase("# заголовок", "<h1>заголовок</h1>")]
     [TestCase("## заголовок", "<h2>заголовок</h2>")]

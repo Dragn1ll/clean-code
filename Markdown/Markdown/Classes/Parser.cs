@@ -11,6 +11,7 @@ public class Parser : IParser
         var tokensBeParsed = new List<Token?>();
 
         line = CheckHeader(tokensBeParsed, line);
+        line = CheckUrl(line);
         
         var words = line.Split(' ');
         var startSymbolStack = new Stack<Token?>();
@@ -143,6 +144,59 @@ public class Parser : IParser
         }
 
         return stringBuilder.ToString();
+    }
+
+    private static string CheckUrl(string line)
+    {
+        var stringBuilder = new StringBuilder();
+        
+        for (var index = 0; index < line.Length; index++)
+        {
+            if (line[index] == '[')
+            {
+                var indexEndSquareBrackets = index + 1;
+                while (indexEndSquareBrackets < line.Length 
+                       && line[indexEndSquareBrackets] != ']')
+                    indexEndSquareBrackets++;
+                
+                if (indexEndSquareBrackets != line.Length 
+                    && line[indexEndSquareBrackets + 1] == '(')
+                {
+                    var indexEndBrackets = indexEndSquareBrackets + 2;
+                    while (indexEndBrackets < line.Length 
+                           && line[indexEndBrackets] != ')')
+                        indexEndBrackets++;
+
+                    if (indexEndBrackets < line.Length)
+                    {
+                        var startLine = line[..index];
+                        var urlName = line.Substring(index + 1, indexEndSquareBrackets - (index + 1));
+                        var url = line
+                            .Substring(indexEndSquareBrackets + 2, indexEndBrackets - (indexEndSquareBrackets + 2));
+                        var afterUrlLine = line.Substring(indexEndBrackets,
+                            line.Length - indexEndBrackets - 1);
+            
+                        if (IsAllSpaces(url))
+                        {
+                            url = "#";
+                        }
+
+                        stringBuilder.Append(startLine);
+                        stringBuilder.Append($"<a href=\"{url}\">{urlName}</a>");
+                        stringBuilder.Append(afterUrlLine);
+                    }
+                }
+            }
+        }
+        
+        return stringBuilder.ToString();
+    }
+    
+    
+
+    private static bool IsAllSpaces(string line)
+    {
+        return line.All(t => t == ' ');
     }
 
     private static bool TryFindTokenEnd(Stack<Token?> stackTokens, List<Token?> tokens, Style style, 

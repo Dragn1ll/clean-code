@@ -1,6 +1,6 @@
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
-using Application.Utilis;
+using Application.Utils;
 using Core.Models;
 using Infrastructure.Services;
 using Infrastructure.Services.Options;

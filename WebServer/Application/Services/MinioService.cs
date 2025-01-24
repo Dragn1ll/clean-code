@@ -1,6 +1,6 @@
 using System.Text;
 using Application.Interfaces.Services;
-using Application.Utilis;
+using Application.Utils;
 using Infrastructure.Services.Options;
 using Microsoft.Extensions.Options;
 using Minio;

@@ -1,7 +1,7 @@
 using Application.Interfaces.Auth;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
-using Application.Utilis;
+using Application.Utils;
 using Core.Enum;
 using Core.Models;
 
