@@ -1,8 +1,8 @@
 using Application.Interfaces.Services;
-using WebServer.Contracts.Users;
-using WebServer.Switches;
+using WebApi.Contracts.Users;
+using WebApi.Switches;
 
-namespace WebServer.Endpoints;
+namespace WebApi.Endpoints;
 
 public static class UsersEndpoints
 {
@@ -25,13 +25,13 @@ public static class UsersEndpoints
     private static async Task<IResult> Login(LoginUserRequest request, IUserService userService, 
         HttpContext context)
     {
-        var loginResult = await userService.Login(request.Email, request.Password);
+            var loginResult = await userService.Login(request.Email, request.Password);
 
         if (!loginResult.IsSuccess) return ErrorSwitcher.SwitchError(loginResult.Error!);
         
-        context.Response.Cookies.Append("", loginResult.Value!);
+        context.Response.Cookies.Append("not-jwt-token", loginResult.Value!);
         
-        return Results.Ok(loginResult.Value);
+        return Results.Ok();
 
     }
 }

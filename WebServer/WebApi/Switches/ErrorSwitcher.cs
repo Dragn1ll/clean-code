@@ -1,7 +1,7 @@
 using Application.Utils;
 using Core.Enum;
 
-namespace WebServer.Switches;
+namespace WebApi.Switches;
 
 public static class ErrorSwitcher
 {

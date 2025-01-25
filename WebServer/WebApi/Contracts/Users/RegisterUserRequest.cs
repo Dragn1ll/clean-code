@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace WebServer.Contracts.Users;
+namespace WebApi.Contracts.Users;
 
-public record LoginUserRequest(
+public record RegisterUserRequest(
+    [Required] string Name,
     [Required] string Email,
     [Required] string Password);
