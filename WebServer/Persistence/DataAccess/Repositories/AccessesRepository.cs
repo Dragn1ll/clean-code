@@ -45,12 +45,12 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
         }
     }
 
-    public async Task<Result> Set(Guid documentId, Permissions newPermission)
+    public async Task<Result> Set(Guid documentId, Guid userId , Permissions newPermission)
     {
         try
         {
             await dbContext.Accesses
-                .Where(a => a.DocumentId == documentId)
+                .Where(a => a.DocumentId == documentId && a.UserId == userId)
                 .ExecuteUpdateAsync(s => 
                     s.SetProperty(a => a.PermissionId, (int)newPermission));
             
@@ -71,14 +71,10 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
                 .Include(a => a.User)
                 .ToListAsync();
 
-            var users = new List<User>();
-            
-            foreach (var userEntity in userEntities)
-            {
-                users.Add(new User(userEntity.UserId, userEntity.User.Username, 
-                    userEntity.User.Email, userEntity.User.PasswordHash, (Role)userEntity.User.RoleId));
-            }
-            
+            var users = userEntities.Select(userEntity => new User(userEntity.UserId, 
+                userEntity.User.Username, userEntity.User.Email, userEntity.User.PasswordHash, 
+                (Role)userEntity.User.RoleId)).ToList();
+
             return Result<IEnumerable<User>>.Success(users);
         }
         catch (Exception exception)
@@ -96,14 +92,10 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
                 .Include(a => a.User)
                 .ToListAsync();
 
-            var users = new List<User>();
-            
-            foreach (var userEntity in userEntities)
-            {
-                users.Add(new User(userEntity.UserId, userEntity.User.Username, 
-                    userEntity.User.Email, userEntity.User.PasswordHash, (Role)userEntity.User.RoleId));
-            }
-            
+            var users = userEntities.Select(userEntity => new User(userEntity.UserId, 
+                userEntity.User.Username, userEntity.User.Email, userEntity.User.PasswordHash, 
+                (Role)userEntity.User.RoleId)).ToList();
+
             return Result<IEnumerable<User>>.Success(users);
         }
         catch (Exception exception)
@@ -121,15 +113,27 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
                 .Include(a => a.User)
                 .ToListAsync();
 
-            var users = new List<User>();
-            
-            foreach (var userEntity in userEntities)
-            {
-                users.Add(new User(userEntity.UserId, userEntity.User.Username, 
-                    userEntity.User.Email, userEntity.User.PasswordHash, (Role)userEntity.User.RoleId));
-            }
-            
+            var users = userEntities.Select(userEntity => new User(userEntity.UserId, 
+                userEntity.User.Username, userEntity.User.Email, userEntity.User.PasswordHash, 
+                (Role)userEntity.User.RoleId)).ToList();
+
             return Result<IEnumerable<User>>.Success(users);
+        }
+        catch (Exception exception)
+        {
+            return Result<IEnumerable<User>>.Failure(new Error(ErrorType.ServerError, exception.Message));
+        }
+    }
+
+    public async Task<Result> DeleteAll(Guid documentId)
+    {
+        try
+        {
+            await dbContext.Accesses
+                .Where(a => a.DocumentId == documentId)
+                .ExecuteDeleteAsync();
+            
+            return Result.Success();
         }
         catch (Exception exception)
         {

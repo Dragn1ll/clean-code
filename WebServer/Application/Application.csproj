@@ -15,4 +15,10 @@
       <PackageReference Include="Minio" Version="6.0.4" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Markdown">
+        <HintPath>bin\Debug\net8.0\Markdown.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

@@ -22,6 +22,12 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
             };
             
             await dbContext.Documents.AddAsync(documentEntity);
+            await dbContext.Accesses.AddAsync(new AccessEntity
+            {
+                Id = documentEntity.Id,
+                UserId = userId,
+                PermissionId = (int)Permissions.Master
+            });
             await dbContext.SaveChangesAsync();
         
             return Result<Guid>.Success(documentEntity.Id);

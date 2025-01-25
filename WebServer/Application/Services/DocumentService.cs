@@ -3,18 +3,29 @@ using Application.Interfaces.Services;
 using Application.Utils;
 using Core.Enum;
 using Core.Models;
-using Infrastructure.Services;
-using Infrastructure.Services.Options;
-using Microsoft.Extensions.Options;
 
 namespace Application.Services;
 
 public class DocumentService(
     IDocumentsRepository documentsRepository,
     IMinioService minioService,
-    IOptions<MinioOptions> minioConfig)
+    IMdService mdService)
     : IDocumentService
 {
+    public async Task<Result> Check(Guid documentId)
+    {
+        var checkResult = await documentsRepository.Check(documentId);
+        
+        if (!checkResult.IsSuccess)
+            return Result.Failure(checkResult.Error);
+        
+        if (checkResult.Value == false)
+            return Result.Failure(new Error(ErrorType.NotFound, 
+                "Такого документа не существует!"));
+        
+        return Result.Success();
+    }
+    
     public async Task<Result> Create(Guid userId, string title)
     {
         var result = await documentsRepository.Create(userId, title);
@@ -37,6 +48,10 @@ public class DocumentService(
 
     public async Task<Result> Delete(Guid documentId)
     {
+        var checkResult = await Check(documentId);
+        if (!checkResult.IsSuccess)
+            return Result.Failure(checkResult.Error);
+        
         var deleteResult = await documentsRepository.Delete(documentId);
         if (!deleteResult.IsSuccess)
             return deleteResult;
@@ -53,13 +68,48 @@ public class DocumentService(
         return Result.Success();
     }
 
+    public async Task<Result<string>> ConvertToHtml(Guid documentId, string mdText)
+    {
+        var checkResult = await Check(documentId);
+        if (!checkResult.IsSuccess)
+            return Result<string>.Failure(checkResult.Error);
+        
+        var lines = mdText.Split(Environment.NewLine);
+        var htmlCode = (await mdService.ConvertToHtml(lines[0])).Value;
+
+        foreach (var line in lines)
+        {
+            var tmpResult = await mdService.ConvertToHtml(line);
+            
+            if (!tmpResult.IsSuccess)
+                return tmpResult;
+            
+            htmlCode += "\n" + tmpResult.Value;
+        }
+        
+        var pushResult = await minioService.PushDocument(documentId, htmlCode!);
+        
+        if (!pushResult.IsSuccess) return Result<string>.Failure(new Error(ErrorType.ServerError, 
+            "Не удалось загрузить получившийся документ в систему..."));
+        
+        return Result<string>.Success(htmlCode!);
+    }
+
     public async Task<Result> Rename(Guid documentId, string newTitle)
     {
+        var checkResult = await Check(documentId);
+        if (!checkResult.IsSuccess)
+            return Result.Failure(checkResult.Error);
+        
         return await documentsRepository.Rename(documentId, newTitle);
     }
 
     public async Task<Result<MdDocument>> Get(Guid documentId)
     {
+        var checkResult = await Check(documentId);
+        if (!checkResult.IsSuccess)
+            return Result<MdDocument>.Failure(checkResult.Error);
+        
         return await documentsRepository.GetById(documentId);
     }
 

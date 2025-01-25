@@ -12,11 +12,28 @@ namespace Persistence.DataAccess.Repositories;
 public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHasher) : IUsersRepository
 {
     public async Task<Result<bool>> CheckById(Guid userId)
-    {try
+    {
+        try
         {
             var user = await dbContext.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userId);
+        
+            return Result<bool>.Success(user is not null);
+        }
+        catch (Exception exception)
+        {
+            return Result<bool>.Failure(new Error(ErrorType.ServerError, exception.Message));
+        }
+    }
+
+    public async Task<Result<bool>> CheckByEmail(string email)
+    {
+        try
+        {
+            var user = await dbContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
         
             return Result<bool>.Success(user is not null);
         }

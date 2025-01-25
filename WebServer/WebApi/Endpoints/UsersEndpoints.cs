@@ -25,7 +25,7 @@ public static class UsersEndpoints
     private static async Task<IResult> Login(LoginUserRequest request, IUserService userService, 
         HttpContext context)
     {
-            var loginResult = await userService.Login(request.Email, request.Password);
+        var loginResult = await userService.Login(request.Email, request.Password);
 
         if (!loginResult.IsSuccess) return ErrorSwitcher.SwitchError(loginResult.Error!);
         
