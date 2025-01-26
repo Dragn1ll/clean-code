@@ -8,7 +8,7 @@ using Persistence.DataAccess;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Persistence.Migrations
 {
     [DbContext(typeof(WebDbContext))]
     partial class WebDbContextModelSnapshot : ModelSnapshot
@@ -22,10 +22,9 @@ namespace Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.AccessEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.AccessEntity", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("DocumentId")
@@ -34,21 +33,16 @@ namespace Infrastructure.Migrations
                     b.Property<int>("PermissionId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
+                    b.HasKey("UserId", "DocumentId", "PermissionId");
 
                     b.HasIndex("DocumentId");
 
                     b.HasIndex("PermissionId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Accesses");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.DocumentEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.DocumentEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -71,7 +65,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Documents");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.PermissionEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.PermissionEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -86,9 +80,31 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Permissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "NoAccess"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Read"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Write"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Master"
+                        });
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.RoleEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.RoleEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -103,9 +119,21 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "User"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Admin"
+                        });
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.UserEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -133,22 +161,22 @@ namespace Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.AccessEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.AccessEntity", b =>
                 {
-                    b.HasOne("Infrastructure.DataAccess.Entities.DocumentEntity", "Document")
-                        .WithMany("Users")
+                    b.HasOne("Persistence.DataAccess.Entities.DocumentEntity", "Document")
+                        .WithMany("Accesses")
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.DataAccess.Entities.PermissionEntity", "Permission")
+                    b.HasOne("Persistence.DataAccess.Entities.PermissionEntity", "Permission")
                         .WithMany("UsersDocuments")
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.DataAccess.Entities.UserEntity", "User")
-                        .WithMany("AssignedPermissions")
+                    b.HasOne("Persistence.DataAccess.Entities.UserEntity", "User")
+                        .WithMany("Accesses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -160,10 +188,10 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.DocumentEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.DocumentEntity", b =>
                 {
-                    b.HasOne("Infrastructure.DataAccess.Entities.UserEntity", "Author")
-                        .WithMany("AuthoredDocuments")
+                    b.HasOne("Persistence.DataAccess.Entities.UserEntity", "Author")
+                        .WithMany("Documents")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -171,9 +199,9 @@ namespace Infrastructure.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.UserEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.UserEntity", b =>
                 {
-                    b.HasOne("Infrastructure.DataAccess.Entities.RoleEntity", "Role")
+                    b.HasOne("Persistence.DataAccess.Entities.RoleEntity", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -182,26 +210,26 @@ namespace Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.DocumentEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.DocumentEntity", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("Accesses");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.PermissionEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.PermissionEntity", b =>
                 {
                     b.Navigation("UsersDocuments");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.RoleEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.RoleEntity", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Infrastructure.DataAccess.Entities.UserEntity", b =>
+            modelBuilder.Entity("Persistence.DataAccess.Entities.UserEntity", b =>
                 {
-                    b.Navigation("AssignedPermissions");
+                    b.Navigation("Accesses");
 
-                    b.Navigation("AuthoredDocuments");
+                    b.Navigation("Documents");
                 });
 #pragma warning restore 612, 618
         }

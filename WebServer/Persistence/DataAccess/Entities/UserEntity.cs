@@ -8,6 +8,6 @@ public class UserEntity
     public string PasswordHash { get; set; } = string.Empty;
     public int RoleId { get; set; }
     public RoleEntity Role { get; set; } = null!;
-    public IEnumerable<DocumentEntity> AuthoredDocuments { get; set; } = new List<DocumentEntity>();
-    public IEnumerable<AccessEntity> AssignedPermissions { get; set; } = new List<AccessEntity>();
+    public ICollection<DocumentEntity> Documents { get; set; } = new List<DocumentEntity>();
+    public ICollection<AccessEntity> Accesses { get; set; } = new List<AccessEntity>();
 }

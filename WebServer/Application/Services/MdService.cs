@@ -10,6 +10,9 @@ public class MdService : IMdService
 
     public async Task<Result<string>> ConvertToHtml(string mdText)
     {
-        return await Task.Run(() => Result<string>.Success(_markdownProcessor.ConvertToHtml(mdText)));
+        var convertedText = await Task.Run(() => 
+            Result<string>.Success(_markdownProcessor.ConvertToHtml(mdText)));
+        
+        return convertedText;
     }
 }

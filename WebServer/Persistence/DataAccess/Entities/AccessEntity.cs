@@ -2,11 +2,12 @@ namespace Persistence.DataAccess.Entities;
 
 public class AccessEntity
 {
-    public Guid Id { get; set; }
     public Guid UserId { get; set; }
-    public UserEntity User { get; set; } = new UserEntity();
+    public UserEntity User { get; set; } = null!;
+    
     public int PermissionId { get; set; }
-    public PermissionEntity Permission { get; set; } = new PermissionEntity();
+    public PermissionEntity Permission { get; set; } = null!;
+    
     public Guid DocumentId { get; set; }
-    public DocumentEntity Document { get; set; } = new DocumentEntity();
+    public DocumentEntity Document { get; set; } = null!;
 }

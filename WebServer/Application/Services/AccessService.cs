@@ -40,14 +40,11 @@ public class AccessService(
     public async Task<Result> Create(Guid userId, Guid documentId, Permissions permission)
     {
         var checkUserDocumentResult = await Check(userId, documentId);
-        if (!checkUserDocumentResult.IsSuccess)
-            return Result.Failure(checkUserDocumentResult.Error);
-        
-        if (checkUserDocumentResult.Value != null)
-            return Result.Failure(new Error(ErrorType.BadRequest, 
+        if (checkUserDocumentResult.IsSuccess)
+            return Result.Failure(new Error(ErrorType.BadRequest,
                 "Этому пользователю уже присвоен уровень доступа!"));
         
-        return await accessRepository.Create(userId, documentId, permission);
+        return await accessRepository.Create(documentId, userId, permission);
     }
 
     public async Task<Result> Set(Guid userId, Guid documentId, Permissions newPermission)

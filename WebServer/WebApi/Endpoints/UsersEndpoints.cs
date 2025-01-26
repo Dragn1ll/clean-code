@@ -29,9 +29,8 @@ public static class UsersEndpoints
 
         if (!loginResult.IsSuccess) return ErrorSwitcher.SwitchError(loginResult.Error!);
         
-        context.Response.Cookies.Append("not-jwt-token", loginResult.Value!);
+        context.Response.Cookies.Append("jwt-cookies", loginResult.Value!);
         
         return Results.Ok();
-
     }
 }

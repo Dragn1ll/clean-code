@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
+namespace Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class InitialAfterChange : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -83,14 +85,13 @@ namespace Infrastructure.Migrations
                 name: "Accesses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     PermissionId = table.Column<int>(type: "integer", nullable: false),
                     DocumentId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Accesses", x => x.Id);
+                    table.PrimaryKey("PK_Accesses", x => new { x.UserId, x.DocumentId, x.PermissionId });
                     table.ForeignKey(
                         name: "FK_Accesses_Documents_DocumentId",
                         column: x => x.DocumentId,
@@ -111,6 +112,26 @@ namespace Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Permissions",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "NoAccess" },
+                    { 2, "Read" },
+                    { 3, "Write" },
+                    { 4, "Master" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "User" },
+                    { 2, "Admin" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Accesses_DocumentId",
                 table: "Accesses",
@@ -120,11 +141,6 @@ namespace Infrastructure.Migrations
                 name: "IX_Accesses_PermissionId",
                 table: "Accesses",
                 column: "PermissionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Accesses_UserId",
-                table: "Accesses",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Documents_AuthorId",

@@ -1,8 +1,8 @@
 using System.Text;
 using Application.Interfaces.Services;
+using Application.Services.Options;
 using Application.Utils;
 using Core.Enum;
-using Infrastructure.Services.Options;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;

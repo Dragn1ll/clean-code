@@ -8,16 +8,10 @@ public class DocumentConfiguration : IEntityTypeConfiguration<DocumentEntity>
 {
     public void Configure(EntityTypeBuilder<DocumentEntity> builder)
     {
-        builder.HasKey(d => d.Id);
-
         builder
             .HasOne(d => d.Author)
-            .WithMany(a => a.AuthoredDocuments)
-            .HasForeignKey(d => d.AuthorId);
-        
-        builder
-            .HasMany(d => d.Users)
-            .WithOne(u => u.Document)
-            .HasForeignKey(u => u.DocumentId);
+            .WithMany(u => u.Documents)
+            .HasForeignKey(d => d.AuthorId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

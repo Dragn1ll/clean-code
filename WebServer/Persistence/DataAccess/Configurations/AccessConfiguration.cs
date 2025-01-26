@@ -8,21 +8,21 @@ public class AccessConfiguration : IEntityTypeConfiguration<AccessEntity>
 {
     public void Configure(EntityTypeBuilder<AccessEntity> builder)
     {
-        builder.HasKey(up => up.Id);
-        
-        builder
-            .HasOne(up => up.User)
-            .WithMany(u => u.AssignedPermissions)
-            .HasForeignKey(up => up.UserId);
-        
-        builder
-            .HasOne(up => up.Permission)
+        builder.HasKey(a => new { a.UserId, a.DocumentId, a.PermissionId });
+
+        builder.HasOne(a => a.User)
+            .WithMany(u => u.Accesses)
+            .HasForeignKey(a => a.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(a => a.Document)
+            .WithMany(d => d.Accesses)
+            .HasForeignKey(a => a.DocumentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(a => a.Permission)
             .WithMany(p => p.UsersDocuments)
-            .HasForeignKey(up => up.PermissionId);
-        
-        builder
-            .HasOne(up => up.Document)
-            .WithMany(d => d.Users)
-            .HasForeignKey(up => up.DocumentId);
+            .HasForeignKey(a => a.PermissionId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

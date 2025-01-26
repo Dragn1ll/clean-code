@@ -29,14 +29,16 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
     {
         try
         {
-            await dbContext.Accesses.AddAsync(new AccessEntity()
+            var accessEntity = new AccessEntity
             {
                 DocumentId = documentId,
                 UserId = userId,
                 PermissionId = (int)permission
-            });
+            };
+
+            await dbContext.Accesses.AddAsync(accessEntity);
             await dbContext.SaveChangesAsync();
-            
+
             return Result.Success();
         }
         catch (Exception exception)
@@ -44,6 +46,7 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
             return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
+
 
     public async Task<Result> Set(Guid documentId, Guid userId , Permissions newPermission)
     {

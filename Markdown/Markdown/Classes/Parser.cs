@@ -1,6 +1,7 @@
 ﻿using Markdown.Interfaces;
 using System.Text;
 using Markdown.Enums;
+using static System.String;
 
 namespace Markdown.Classes;
 
@@ -189,7 +190,7 @@ public class Parser : IParser
             }
         }
         
-        return stringBuilder.ToString();
+        return stringBuilder.ToString() == Empty ? line : stringBuilder.ToString();
     }
     
     

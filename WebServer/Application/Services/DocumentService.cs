@@ -26,7 +26,7 @@ public class DocumentService(
         return Result.Success();
     }
     
-    public async Task<Result> Create(Guid userId, string title)
+    public async Task<Result<Guid>> Create(Guid userId, string title)
     {
         var result = await documentsRepository.Create(userId, title);
         
@@ -40,10 +40,10 @@ public class DocumentService(
         catch (Exception exception)
         {
             await documentsRepository.Delete(result.Value);
-            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
+            return Result<Guid>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
         
-        return Result.Success();
+        return result;
     }
 
     public async Task<Result> Delete(Guid documentId)

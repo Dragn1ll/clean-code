@@ -16,7 +16,7 @@ public class JwtWorker(IOptions<JwtOptions> options) : IJwtWorker
     {
         var claims = new[]
         {
-            new Claim("UserId", user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         };
         
         var credentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)), 

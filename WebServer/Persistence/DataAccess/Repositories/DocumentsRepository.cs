@@ -22,12 +22,6 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
             };
             
             await dbContext.Documents.AddAsync(documentEntity);
-            await dbContext.Accesses.AddAsync(new AccessEntity
-            {
-                Id = documentEntity.Id,
-                UserId = userId,
-                PermissionId = (int)Permissions.Master
-            });
             await dbContext.SaveChangesAsync();
         
             return Result<Guid>.Success(documentEntity.Id);
@@ -133,7 +127,7 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
     {
         var documentsEntities = await dbContext.Documents
             .AsNoTracking()
-            .Where(document => document.Users.FirstOrDefault(up => up.UserId == userId) != null)
+            .Where(document => document.Accesses.FirstOrDefault(up => up.UserId == userId) != null)
             .ToListAsync();
             
         var documents = new List<MdDocument>();

@@ -8,8 +8,12 @@ namespace WebApi.Extensions;
 
 public static class ApiExtensions
 {
-    public static void AddApiAuthentication(this IServiceCollection services, IOptions<JwtOptions> jwtOptions)
+    public static void AddApiAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
+
+        var jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
@@ -19,15 +23,16 @@ public static class ApiExtensions
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.SecretKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtOptions!.SecretKey))
                 };
 
                 options.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = context =>
                     {
-                        context.Token = context.Request.Query["not-jwt-token"];
-                        
+                        context.Token = context.Request.Cookies["jwt-cookies"];
+
                         return Task.CompletedTask;
                     }
                 };
