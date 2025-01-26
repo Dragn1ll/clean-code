@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebApi.Contracts.Documents;
 
-public record ConvertDocumentRequest(
+public record RenameDocumentRequest(
     [Required] Guid DocumentId,
-    [Required] string Content);
+    [Required] string NewName
+    );

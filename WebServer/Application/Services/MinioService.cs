@@ -20,6 +20,7 @@ public class MinioService : IMinioService
         _minioClient = new MinioClient()
             .WithEndpoint(_minioConfig.Endpoint)
             .WithCredentials(_minioConfig.AccessKey, _minioConfig.SecretKey)
+            .WithSSL(false)
             .Build();
     }
 
@@ -27,7 +28,8 @@ public class MinioService : IMinioService
     {
         try
         {
-            var bucketExists = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_minioConfig.BucketName));
+            var bucketExists = await _minioClient.BucketExistsAsync(
+                new BucketExistsArgs().WithBucket(_minioConfig.BucketName));
             if (!bucketExists)
             {
                 await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(_minioConfig.BucketName));
@@ -35,7 +37,7 @@ public class MinioService : IMinioService
 
             var objectName = $"{documentId}.txt";
 
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(string.Empty));
+            using var stream = new MemoryStream("Hello World!"u8.ToArray());
             await _minioClient.PutObjectAsync(new PutObjectArgs()
                 .WithBucket(_minioConfig.BucketName)
                 .WithObject(objectName)

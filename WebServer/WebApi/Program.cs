@@ -17,7 +17,7 @@ builder.Configuration
     .AddJsonFile("appsettings.Secrets.json", optional: true, reloadOnChange: true);
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
-builder.Services.Configure<MinioOptions>(builder.Configuration.GetSection(nameof(MinioOptions)));
+builder.Services.Configure<MinioOptions>(builder.Configuration.GetSection("Minio"));
 builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddDbContext<WebDbContext>(
     options =>
