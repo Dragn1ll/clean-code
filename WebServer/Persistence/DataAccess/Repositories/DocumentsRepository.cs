@@ -87,7 +87,6 @@ public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
         try
         {
             var document = await dbContext.Documents
-                .AsNoTracking()
                 .FirstOrDefaultAsync(document => document.Id == documentId);
             
             return Result<bool>.Success(document is not null);

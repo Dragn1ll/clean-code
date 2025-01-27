@@ -16,7 +16,6 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
         try
         {
             var user = await dbContext.Users
-                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userId);
         
             return Result<bool>.Success(user is not null);
@@ -32,7 +31,6 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
         try
         {
             var user = await dbContext.Users
-                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Email == email);
         
             return Result<bool>.Success(user is not null);

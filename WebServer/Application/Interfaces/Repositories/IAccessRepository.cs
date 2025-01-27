@@ -12,5 +12,5 @@ public interface IAccessRepository
     Task<Result<IEnumerable<User>>> Get(Guid documentId);
     Task<Result<IEnumerable<User>>> GetReaders(Guid documentId);
     Task<Result<IEnumerable<User>>> GetWriters(Guid documentId);
-    Task<Result> DeleteAll(Guid documentId);
+    Task<Result> Delete(Guid documentId, Guid userId);
 }

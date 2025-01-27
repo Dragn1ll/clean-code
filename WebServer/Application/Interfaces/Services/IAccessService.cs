@@ -10,8 +10,8 @@ public interface IAccessService
     Task<Result> CheckMaster(Guid userId, Guid documentId);
     Task<Result> Create(Guid userId, Guid documentId, Permissions permission);
     Task<Result> Set(Guid userId, Guid documentId, Permissions newPermission);
-    Task<Result<IEnumerable<User>>> Get(Guid documentId);
+    Task<Result<IEnumerable<User>>> GetUsers(Guid documentId);
     Task<Result<IEnumerable<User>>> GetReaders(Guid documentId);
     Task<Result<IEnumerable<User>>> GetWriters(Guid documentId);
-    Task<Result> DeleteAll(Guid documentId);
+    Task<Result> Delete(Guid documentId, Guid userId);
 }

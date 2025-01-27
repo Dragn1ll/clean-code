@@ -41,8 +41,8 @@ public class MarkdownProcessorShouldTest
         Assert.That(output, Is.EqualTo(expected));
     }
     
-    [TestCase("[ссылка]()", "<a href=\"#\">ссылка</a>")]
-    [TestCase("[ссылка](www.google.com)", "<a href=\"www.google.com\">ссылка</a>")]
+    [TestCase("[ссылка]()", """<a href="#">ссылка</a>""")]
+    [TestCase("[ссылка](www.google.com)", """<a href="www.google.com">ссылка</a>""")]
     public void ConvertToHtml_ShouldOutputUrl(string input, string expected)
     {
         var output = _markdownProcessor.ConvertToHtml(input);

@@ -1,3 +1,4 @@
+using Application.Dto;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Utils;
@@ -74,23 +75,20 @@ public class DocumentService(
         if (!checkResult.IsSuccess)
             return Result<string>.Failure(checkResult.Error);
         
-        var lines = mdText.Split(Environment.NewLine);
+        var lines = mdText == string.Empty 
+            ? [string.Empty] 
+            : mdText.Split(Environment.NewLine);
         var htmlCode = (await mdService.ConvertToHtml(lines[0])).Value;
 
-        foreach (var line in lines)
+        for (var index = 1; index < lines.Length; index++)
         {
-            var tmpResult = await mdService.ConvertToHtml(line);
+            var tmpResult = await mdService.ConvertToHtml(lines[index]);
             
             if (!tmpResult.IsSuccess)
                 return tmpResult;
             
-            htmlCode += "\n" + tmpResult.Value;
+            htmlCode += Environment.NewLine + tmpResult.Value;
         }
-        
-        var pushResult = await minioService.PushDocument(documentId, htmlCode!);
-        
-        if (!pushResult.IsSuccess) return Result<string>.Failure(new Error(ErrorType.ServerError, 
-            "Не удалось загрузить получившийся документ в систему..."));
         
         return Result<string>.Success(htmlCode!);
     }

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.CookiePolicy;
 using Persistence.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Persistence.DataAccess.Repositories;
-using WebApi.Endpoints;
 using WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,8 +58,6 @@ app.UseCookiePolicy(new CookiePolicyOptions
 });
 
 app.UseHttpsRedirection();
-
-app.MapUsersEndpoints();
 
 app.UseAuthorization();
 

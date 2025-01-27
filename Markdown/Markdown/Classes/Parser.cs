@@ -183,7 +183,7 @@ public class Parser : IParser
                         }
 
                         stringBuilder.Append(startLine);
-                        stringBuilder.Append($"<a href=\"{url}\">{urlName}</a>");
+                        stringBuilder.Append($"""<a href="{url}">{urlName}</a>""");
                         stringBuilder.Append(afterUrlLine);
                     }
                 }

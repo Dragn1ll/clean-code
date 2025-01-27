@@ -31,7 +31,7 @@ public class AccessService(
         if (!checkUserDocumentResult.IsSuccess)
             return Result.Failure(checkUserDocumentResult.Error);
 
-        return checkUserDocumentResult.Value!.Permissions == Permissions.Master
+        return checkUserDocumentResult.Value!.Permission == Permissions.Master
             ? Result.Success()
             : Result.Failure(new Error(ErrorType.BadRequest, 
                 "Пользователь не является создателем документа"));
@@ -54,10 +54,10 @@ public class AccessService(
             return Result.Failure(new Error(ErrorType.BadRequest,
                 "У этого пользователя нет доступа к документу!"));
 
-        return await accessRepository.Set(userId, documentId, newPermission);
+        return await accessRepository.Set(documentId, userId, newPermission);
     }
 
-    public async Task<Result<IEnumerable<User>>> Get(Guid documentId)
+    public async Task<Result<IEnumerable<User>>> GetUsers(Guid documentId)
     {
         var checkDocumentResult = await documentService.Check(documentId);
         if (!checkDocumentResult.IsSuccess)
@@ -84,12 +84,12 @@ public class AccessService(
         return await accessRepository.GetWriters(documentId);
     }
 
-    public async Task<Result> DeleteAll(Guid documentId)
+    public async Task<Result> Delete(Guid documentId, Guid userId)
     {
         var checkDocumentResult = await documentService.Check(documentId);
         if (!checkDocumentResult.IsSuccess)
             return Result<IEnumerable<User>>.Failure(checkDocumentResult.Error);
 
-        return await accessRepository.DeleteAll(documentId);
+        return await accessRepository.Delete(documentId, userId);
     }
 }

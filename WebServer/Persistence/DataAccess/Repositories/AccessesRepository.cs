@@ -128,12 +128,12 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
         }
     }
 
-    public async Task<Result> DeleteAll(Guid documentId)
+    public async Task<Result> Delete(Guid documentId, Guid userId)
     {
         try
         {
             await dbContext.Accesses
-                .Where(a => a.DocumentId == documentId)
+                .Where(a => a.DocumentId == documentId && a.UserId == userId)
                 .ExecuteDeleteAsync();
             
             return Result.Success();
