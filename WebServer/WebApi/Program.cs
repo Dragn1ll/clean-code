@@ -9,6 +9,8 @@ using Persistence.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Persistence.DataAccess.Repositories;
 using WebApi.Extensions;
+using WebApi.Filters.Accesses;
+using WebApi.Filters.Documents;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,14 @@ builder.Services.AddScoped<IAccessRepository, AccessesRepository>();
 
 builder.Services.AddScoped<IJwtWorker, JwtWorker>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddScoped<DocumentGetFilter>();
+builder.Services.AddScoped<DocumentDeleteFilter>();
+builder.Services.AddScoped<DocumentChangeFilter>();
+builder.Services.AddScoped<DocumentRenameFilter>();
+builder.Services.AddScoped<CreateSetAccessFilter>();
+builder.Services.AddScoped<DeleteAccessFilter>();
+builder.Services.AddScoped<GetAccessFilter>();
 
 var app = builder.Build();
 

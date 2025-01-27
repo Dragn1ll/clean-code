@@ -5,6 +5,7 @@ using Core.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Contracts.Accesses;
+using WebApi.Filters.Accesses;
 using WebApi.Switches;
 
 namespace WebApi.Controllers;
@@ -31,18 +32,10 @@ public class AccessController : ControllerBase
     }
 
     [HttpPost("create")]
+    [ServiceFilter(typeof(CreateSetAccessFilter))]
     public async Task<IResult> Create([FromBody] CreateSetAccessRequest request, IUserService userService,
         IAccessService accessService)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-        
-        var checkMasterResult = await accessService.CheckMaster(userId, request.DocumentId);
-        if (!checkMasterResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(checkMasterResult.Error!);
-        
-        if (request.PermissionId < (int)Permissions.Master)
-            return Results.BadRequest("Нельзя присвоить обычному пользователю такие возможности!");
-        
         var getEmailResult = await userService.GetByEmail(request.UserEmail);
         if (!getEmailResult.IsSuccess)
             return ErrorSwitcher.SwitchError(getEmailResult.Error!);
@@ -55,15 +48,10 @@ public class AccessController : ControllerBase
     }
 
     [HttpDelete("delete")]
+    [ServiceFilter(typeof(DeleteAccessFilter))]
     public async Task<IResult> Delete([FromBody] DeleteAccessRequest request, IUserService userService,
         IAccessService accessService)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-        
-        var checkMasterResult = await accessService.CheckMaster(userId, request.DocumentId);
-        if (!checkMasterResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(checkMasterResult.Error!);
-        
         var getEmailResult = await userService.GetByEmail(request.UserEmail);
         if (!getEmailResult.IsSuccess)
             return ErrorSwitcher.SwitchError(getEmailResult.Error!);
@@ -75,18 +63,10 @@ public class AccessController : ControllerBase
     }
 
     [HttpPost("set")]
+    [ServiceFilter(typeof(CreateSetAccessFilter))]
     public async Task<IResult> Set([FromBody] CreateSetAccessRequest request, IUserService userService,
         IAccessService accessService)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-        
-        var checkMasterResult = await accessService.CheckMaster(userId, request.DocumentId);
-        if (!checkMasterResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(checkMasterResult.Error!);
-        
-        if (request.PermissionId < (int)Permissions.Master)
-            return Results.BadRequest("Нельзя присвоить обычному пользователю такие возможности!");
-        
         var getEmailResult = await userService.GetByEmail(request.UserEmail);
         if (!getEmailResult.IsSuccess)
             return ErrorSwitcher.SwitchError(getEmailResult.Error!);
@@ -99,14 +79,9 @@ public class AccessController : ControllerBase
     }
 
     [HttpGet("get/users")]
+    [ServiceFilter(typeof(GetAccessFilter))]
     public async Task<IResult> GetUsers([FromQuery] GetAccessRequest request, IAccessService accessService)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-        
-        var checkMasterResult = await accessService.CheckMaster(userId, request.DocumentId);
-        if (!checkMasterResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(checkMasterResult.Error!);
-        
         var getUsersAccessResult = await accessService.GetUsers(request.DocumentId);
         if (!getUsersAccessResult.IsSuccess)
             return ErrorSwitcher.SwitchError(getUsersAccessResult.Error!);
@@ -123,14 +98,9 @@ public class AccessController : ControllerBase
     }
 
     [HttpGet("get/readers")]
+    [ServiceFilter(typeof(GetAccessFilter))]
     public async Task<IResult> GetReaders([FromQuery] GetAccessRequest request, IAccessService accessService)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-        
-        var checkMasterResult = await accessService.CheckMaster(userId, request.DocumentId);
-        if (!checkMasterResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(checkMasterResult.Error!);
-        
         var getUsersAccessResult = await accessService.GetReaders(request.DocumentId);
         if (!getUsersAccessResult.IsSuccess)
             return ErrorSwitcher.SwitchError(getUsersAccessResult.Error!);
@@ -147,14 +117,9 @@ public class AccessController : ControllerBase
     }
 
     [HttpGet("get/writers")]
+    [ServiceFilter(typeof(GetAccessFilter))]
     public async Task<IResult> GetWriters([FromQuery] GetAccessRequest request, IAccessService accessService)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-        
-        var checkMasterResult = await accessService.CheckMaster(userId, request.DocumentId);
-        if (!checkMasterResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(checkMasterResult.Error!);
-        
         var getUsersAccessResult = await accessService.GetWriters(request.DocumentId);
         if (!getUsersAccessResult.IsSuccess)
             return ErrorSwitcher.SwitchError(getUsersAccessResult.Error!);
