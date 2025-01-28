@@ -14,11 +14,11 @@ namespace WebApi.Controllers;
 [ApiController]
 [Route("api/document")]
 [Authorize]
-public class DocumentController : ControllerBase
+public class DocumentController(IDocumentService documentService) : ControllerBase
 {
     [HttpPost("create")]
     public async Task<IResult> Create([FromBody] CreateDocumentRequest request, 
-        IDocumentService documentService, IAccessService accessService)
+        [FromServices] IAccessService accessService)
     {
         var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         
@@ -36,7 +36,7 @@ public class DocumentController : ControllerBase
     [HttpGet("get")]
     [ServiceFilter(typeof(DocumentGetFilter))]
     public async Task<IResult> Get([FromQuery] DocumentIdRequest request, 
-        IMinioService minioService, IDocumentService documentService)
+        [FromServices] IMinioService minioService)
     {
         var getContentResult = await minioService.PullDocument(request.DocumentId);
         if (!getContentResult.IsSuccess)
@@ -59,8 +59,7 @@ public class DocumentController : ControllerBase
 
     [HttpDelete("delete")]
     [ServiceFilter(typeof(DocumentDeleteFilter))]
-    public async Task<IResult> Delete([FromBody] DocumentIdRequest request,
-        IDocumentService documentService)
+    public async Task<IResult> Delete([FromBody] DocumentIdRequest request)
     {
         var deleteResult = await documentService.Delete(request.DocumentId);
         return !deleteResult.IsSuccess 
@@ -70,8 +69,8 @@ public class DocumentController : ControllerBase
 
     [HttpPost("convert")]
     [ServiceFilter(typeof(DocumentChangeFilter))]
-    public async Task<IResult> Convert([FromBody] ConvertDocumentRequest request,
-        IDocumentService documentService, IMinioService minioService)
+    public async Task<IResult> Convert([FromBody] ConvertDocumentRequest request, 
+        [FromServices] IMinioService minioService)
     {
         var convertResult = await documentService.ConvertToHtml(request.DocumentId, request.Content);
         if (!convertResult.IsSuccess)
@@ -86,8 +85,7 @@ public class DocumentController : ControllerBase
 
     [HttpPost("rename")]
     [ServiceFilter(typeof(DocumentRenameFilter))]
-    public async Task<IResult> Rename([FromBody] RenameDocumentRequest request,
-        IDocumentService documentService)
+    public async Task<IResult> Rename([FromBody] RenameDocumentRequest request)
     {
         var renameResult = await documentService.Rename(request.DocumentId, request.NewName);
         return renameResult.IsSuccess 

@@ -3,15 +3,18 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Services;
 using Application.Services.Options;
+using FluentValidation;
 using Infrastructure.Auth;
 using Microsoft.AspNetCore.CookiePolicy;
 using Persistence.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Persistence.DataAccess.Repositories;
+using WebApi.Contracts.Users;
 using WebApi.Extensions;
 using WebApi.Filters.Accesses;
 using WebApi.Filters.Documents;
 using WebApi.Middlewares;
+using WebApi.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,8 @@ builder.Services.AddDbContext<WebDbContext>(
 
 builder.Services.AddControllers();
 builder.Services.AddLogging();
+
+builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterValidationRules>();;
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

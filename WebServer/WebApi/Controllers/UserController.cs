@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Application.Dto;
 using Application.Interfaces.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Contracts.Users;
@@ -10,11 +11,17 @@ namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/user")]
-public class UserController : ControllerBase
+public class UserController(IUserService userService) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IResult> Register([FromBody] RegisterUserRequest request, IUserService userService)
+    public async Task<IResult> Register([FromBody] RegisterUserRequest request, 
+        [FromServices] IValidator<RegisterUserRequest> validator)
     {
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+            return Results.BadRequest(validationResult.Errors);
+        
         var registerResult = await userService.Register(request.Name, request.Email, request.Password);
         
         return registerResult.IsSuccess 
@@ -23,7 +30,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IResult> Login([FromBody] LoginUserRequest request, IUserService userService)
+    public async Task<IResult> Login([FromBody] LoginUserRequest request)
     {
         var loginResult = await userService.Login(request.Email, request.Password);
 
@@ -36,7 +43,7 @@ public class UserController : ControllerBase
     
     [Authorize]
     [HttpGet("documents")]
-    public async Task<IResult> GetDocuments(IDocumentService documentService)
+    public async Task<IResult> GetDocuments([FromServices] IDocumentService documentService)
     {
         var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         

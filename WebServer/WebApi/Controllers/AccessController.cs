@@ -13,7 +13,7 @@ namespace WebApi.Controllers;
 [ApiController]
 [Route("api/access")]
 [Authorize]
-public class AccessController : ControllerBase
+public class AccessController(IAccessService accessService) : ControllerBase
 {
     [HttpGet("documents")]
     public async Task<IResult> GetDocuments(IDocumentService documentService)
@@ -33,8 +33,8 @@ public class AccessController : ControllerBase
 
     [HttpPost("create")]
     [ServiceFilter(typeof(CreateSetAccessFilter))]
-    public async Task<IResult> Create([FromBody] CreateSetAccessRequest request, IUserService userService,
-        IAccessService accessService)
+    public async Task<IResult> Create([FromBody] CreateSetAccessRequest request, 
+        [FromServices] IUserService userService)
     {
         var getEmailResult = await userService.GetByEmail(request.UserEmail);
         if (!getEmailResult.IsSuccess)
@@ -49,8 +49,8 @@ public class AccessController : ControllerBase
 
     [HttpDelete("delete")]
     [ServiceFilter(typeof(DeleteAccessFilter))]
-    public async Task<IResult> Delete([FromBody] DeleteAccessRequest request, IUserService userService,
-        IAccessService accessService)
+    public async Task<IResult> Delete([FromBody] DeleteAccessRequest request, 
+        [FromServices] IUserService userService)
     {
         var getEmailResult = await userService.GetByEmail(request.UserEmail);
         if (!getEmailResult.IsSuccess)
@@ -64,8 +64,8 @@ public class AccessController : ControllerBase
 
     [HttpPost("set")]
     [ServiceFilter(typeof(CreateSetAccessFilter))]
-    public async Task<IResult> Set([FromBody] CreateSetAccessRequest request, IUserService userService,
-        IAccessService accessService)
+    public async Task<IResult> Set([FromBody] CreateSetAccessRequest request, 
+        [FromServices] IUserService userService)
     {
         var getEmailResult = await userService.GetByEmail(request.UserEmail);
         if (!getEmailResult.IsSuccess)
@@ -80,7 +80,7 @@ public class AccessController : ControllerBase
 
     [HttpGet("get/users")]
     [ServiceFilter(typeof(GetAccessFilter))]
-    public async Task<IResult> GetUsers([FromQuery] GetAccessRequest request, IAccessService accessService)
+    public async Task<IResult> GetUsers([FromQuery] GetAccessRequest request)
     {
         var getUsersAccessResult = await accessService.GetUsers(request.DocumentId);
         if (!getUsersAccessResult.IsSuccess)
@@ -99,7 +99,7 @@ public class AccessController : ControllerBase
 
     [HttpGet("get/readers")]
     [ServiceFilter(typeof(GetAccessFilter))]
-    public async Task<IResult> GetReaders([FromQuery] GetAccessRequest request, IAccessService accessService)
+    public async Task<IResult> GetReaders([FromQuery] GetAccessRequest request)
     {
         var getUsersAccessResult = await accessService.GetReaders(request.DocumentId);
         if (!getUsersAccessResult.IsSuccess)
@@ -118,7 +118,7 @@ public class AccessController : ControllerBase
 
     [HttpGet("get/writers")]
     [ServiceFilter(typeof(GetAccessFilter))]
-    public async Task<IResult> GetWriters([FromQuery] GetAccessRequest request, IAccessService accessService)
+    public async Task<IResult> GetWriters([FromQuery] GetAccessRequest request)
     {
         var getUsersAccessResult = await accessService.GetWriters(request.DocumentId);
         if (!getUsersAccessResult.IsSuccess)
