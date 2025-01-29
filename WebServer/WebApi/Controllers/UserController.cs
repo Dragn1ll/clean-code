@@ -40,6 +40,18 @@ public class UserController(IUserService userService) : ControllerBase
         
         return Results.Ok();
     }
+
+    [Authorize]
+    [HttpGet("name")]
+    public async Task<IResult> GetUserName()
+    {
+        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        
+        var getResult = await userService.GetById(userId);
+        return !getResult.IsSuccess 
+            ? ErrorSwitcher.SwitchError(getResult.Error!) 
+            : Results.Ok(getResult.Value!.Name);
+    }
     
     [Authorize]
     [HttpGet("documents")]

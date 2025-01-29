@@ -11,14 +11,14 @@ public class DocumentGetFilter(IAccessService accessService) : IAsyncActionFilte
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        if (context.ActionArguments.TryGetValue("request", out var argument))
+        if (context.ActionArguments.TryGetValue("documentId", out var argument))
         {
-            var request = argument as DocumentIdRequest;
+            var documentId = argument as Guid? ?? Guid.Empty;
             
             var userId = Guid.Parse(context.HttpContext.User.Claims.FirstOrDefault(c => 
                 c.Type == ClaimTypes.NameIdentifier)?.Value!);
             
-            var checkAccessResult = await accessService.Check(userId, request!.DocumentId);
+            var checkAccessResult = await accessService.Check(userId, documentId);
             
             if (!checkAccessResult.IsSuccess)
                 context.Result = new BadRequestObjectResult(checkAccessResult.Error!.Message);

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            overflow: hidden; /* Отключаем прокрутку страницы */
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #1e1e1e;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .user-name {
+            font-size: 1.5rem;
+            margin-right: auto;
+            margin-left: 26%;
+        }
+        .header .actions {
+            display: flex;
+            align-items: center;
+        }
+        .header .actions .btn {
+            margin-left: 10px;
+        }
+        .btn {
+            padding: 12px 20px;
+            font-size: 1rem;
+            color: #ffffff;
+            background-color: #6200ea;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #3700b3;
+        }
+        .editor-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(93vh - 120px); /* Высота минус высота хэдера и кнопок */
+            gap: 20px;
+            padding: 20px;
+        }
+        .editor-input, .editor-output {
+            width: 45%;
+            height: 90%; /* Сделаем поля немного выше */
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            overflow-y: auto; /* Для поля вывода */
+        }
+        .editor-output {
+            background-color: #2c2c2c;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #1e1e1e;
+        }
+        .footer .btn {
+            margin-left: 10px;
+        }
+        .document-title {
+            position: absolute;
+            top: 10%;
+            left: 4%;
+            font-size: 2rem;
+            color: #e0e0e0;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+            color: #e0e0e0;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-item .slider {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-item .slider label {
+            margin-right: 10px;
+        }
+
+        .user-item .delete-btn {
+            background-color: #6200ea;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .user-item .delete-btn:hover {
+            background-color: #3700b3;
+        }
+
+        .create-btn {
+            background-color: #6200ea;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .create-btn:hover {
+            background-color: #3700b3;
+        }
+        .delete-btn {
+            background-color: #6200ea;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #3700b3;
+        }
+        .edit-btn {
+            background-color: #6200ea;
+            border: none;
+            color: white;
+            padding: 5px 10px; /* Ставим такие же отступы, как у delete-btn */
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .edit-btn:hover {
+            background-color: #3700b3;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between; /* Кнопка справа, поле ввода слева */
+            align-items: center;
+            gap: 10px;
+        }
+
+        .email-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #2c2c2c;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .email-input::placeholder {
+            color: #aaa;
+        }
+
+        .input-modal-message {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #e0e0e0; /* цвет текста, подстраивайте под стиль */
+        }
+
+        .description-input {
+            font-size: 1rem;
+            color: #e0e0e0; /* Цвет текста */
+            background-color: #2c2c2c; /* Фон для элемента */
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            line-height: 1.6; /* Межстрочный интервал для улучшенной читаемости */
+            word-wrap: break-word; /* Перенос длинных слов */
+        }
+
+        #input-message {
+            margin-top: 10px;
+            margin-bottom: 20px; /* Немного отступа для разделения */
+            font-size: 1rem;
+            color: #e0e0e0;
+            text-align: center; /* Центрируем текст */
+        }
+
+        .input-modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-modal-body {
+            margin-top: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .input-modal-footer {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .input-modal-footer .btn {
+            margin-top: 20px; /* Поднимаем кнопку для ОК */
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Markdown-редактор</h1>
+    <span class="user-name" id="userName">Загрузка...</span>
+    <div class="actions">
+        <button class="btn" id="myDocumentsButton" onclick="window.location.href='/dashboard'">Мои документы</button>
+        <button class="btn" id="logoutButton">Выйти</button>
+    </div>
+</div>
+<div class="document-title" id="documentTitle">Название документа</div>
+<div class="editor-container">
+    <textarea class="editor-input" id="editorInput" placeholder="Введите текст..."></textarea>
+    <div class="editor-output" id="editorOutput">Ответ от сервера появится здесь...</div>
+</div>
+<div class="footer">
+    <button class="btn" id="convertButton">Конвертировать</button>
+    <button class="btn" id="accessSettingsButton">Настройки доступа</button>
+</div>
+<div id="accessModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Настройки доступа</h2>
+            <span class="close-btn" id="closeModalBtn">&times;</span>
+        </div>
+        <div class="modal-body" id="accessModalBody">
+            <!-- Сюда будут добавляться пользователи -->
+        </div>
+        <div class="modal-footer">
+            <input type="email" id="emailInput" class="email-input" placeholder="Введите email...">
+            <button class="create-btn" id="createAccessBtn">Создать</button>
+        </div>
+    </div>
+</div>
+<div id="infoModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Сообщение</h2>
+            <span class="close-btn" id="closeInfoModalBtn">&times;</span>
+        </div>
+        <div class="modal-body" id="infoModalBody">
+            <!-- Сообщение будет добавлено здесь -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn" id="infoModalOkButton">ОК</button>
+        </div>
+    </div>
+</div>
+<div id="inputModal" class="modal">
+    <div class="modal-content input-modal-content">
+        <div class="modal-header">
+            <h2>Введите данные</h2>
+            <span class="close-btn" id="closeInputModalBtn">&times;</span>
+        </div>
+        <div class="modal-body input-modal-body">
+            <!-- Здесь будет выводиться сообщение -->
+            <p id="input-message"></p>
+            <input type="text" id="inputModalField" class="email-input" placeholder="Введите значение...">
+        </div>
+        <div class="modal-footer input-modal-footer">
+            <button class="btn" id="inputModalOkButton">ОК</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const userNameElement = document.getElementById("userName");
+        const logoutButton = document.getElementById("logoutButton");
+        const convertButton = document.getElementById("convertButton");
+        const accessSettingsButton = document.getElementById("accessSettingsButton");
+        const documentTitle = document.getElementById("documentTitle");
+        const editorInput = document.getElementById("editorInput");
+        const editorOutput = document.getElementById("editorOutput");
+        const infoModal = document.getElementById("infoModal");
+        const infoModalBody = document.getElementById("infoModalBody");
+        const infoModalOkButton = document.getElementById("infoModalOkButton");
+        const inputModal = document.getElementById("inputModal");
+        const inputModalField = document.getElementById("inputModalField");
+        const inputModalOkButton = document.getElementById("inputModalOkButton");
+        const inputMessage = document.getElementById("input-message");
+
+        const documentId = window.location.pathname.split("/").pop();
+
+        function showModal(modal) {
+            modal.style.display = "flex";
+        }
+
+        function closeModal(modal) {
+            modal.style.display = "none";
+        }
+
+        function showInfoModal(message) {
+            infoModalBody.textContent = message;
+            showModal(infoModal);
+        }
+
+        function showInputModal(message, callback) {
+            const inputModalMessage = document.createElement('div');
+
+            inputMessage.textContent = message; // добавляем сообщение в модальное окно
+            inputModalField.value = "";
+
+            showModal(inputModal);
+
+            inputModalOkButton.onclick = () => {
+                const value = inputModalField.value.trim();
+                closeModal(inputModal);
+                callback(value);
+
+                // Убираем сообщение, чтобы оно не оставалось при следующих вызовах
+                inputModalMessage.remove();
+            };
+        }
+
+        infoModalOkButton.addEventListener("click", () => closeModal(infoModal));
+
+        logoutButton.addEventListener("click", () => {
+            document.cookie.split(";").forEach(cookie => {
+                document.cookie = cookie
+                    .replace(/^ +/, "")
+                    .replace(/=.*/, "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/");
+            });
+            window.location.href = "/";
+        });
+
+        async function fetchUserName() {
+            try {
+                const response = await fetch('/api/user/name');
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки имени пользователя');
+                }
+                userNameElement.textContent = JSON.parse(await response.text());
+            } catch (error) {
+                console.error(error);
+                userNameElement.textContent = 'Не удалось загрузить имя пользователя';
+            }
+        }
+
+        async function fetchDocument(id) {
+            try {
+                const response = await fetch(`/api/document/get/${id}`);
+                if (!response.ok) {
+                    showInfoModal(await response.text());
+                    window.location.href = "/dashboard";
+                }
+                const data = await response.json();
+                documentTitle.textContent = data.title || "Без названия";
+                editorInput.value = data.text || "";
+                editorOutput.innerHTML = data.convertedText || "Нет данных для отображения.";
+            } catch (error) {
+                console.error("Ошибка при загрузке документа:", error);
+                documentTitle.textContent = "Ошибка загрузки документа";
+            }
+        }
+
+        convertButton.addEventListener("click", async () => {
+            const content = editorInput.value.trim();
+            if (content === "") {
+                editorOutput.textContent = "Ошибка: Поле ввода не может быть пустым.";
+                return;
+            }
+            try {
+                const response = await fetch('/api/document/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ documentId, content })
+                });
+                if (!response.ok) {
+                    showInfoModal(await response.text());
+                    window.location.reload();
+                }
+                editorOutput.innerHTML = JSON.parse(await response.text());
+            } catch (error) {
+                console.error(error);
+                editorOutput.textContent = "Ошибка при конвертации текста.";
+            }
+        });
+
+        // Логика настройки доступа
+        accessSettingsButton.addEventListener("click", async () => {
+            const modal = document.getElementById("accessModal");
+            const modalBody = document.getElementById("accessModalBody");
+
+            // Очищаем содержимое модального окна
+            modalBody.innerHTML = "";
+
+            // Запрашиваем данные о пользователях с доступом
+            try {
+                const response = await fetch(`/api/access/get/users?DocumentId=${documentId}`);
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки данных о доступе');
+                }
+
+                const users = await response.json();
+
+                users.forEach(user => {
+                    const userItem = document.createElement("div");
+                    userItem.className = "user-item";
+
+                    const userInfo = document.createElement("span");
+                    userInfo.textContent = `${user.email} - ${user.permission === "Master" ? "Хозяин"
+                        : user.permission === "Read" ? "Читатель" : "Писатель"}`;
+
+                    if (user.permission !== "Master") {
+                        const editButton = document.createElement("button");
+                        editButton.className = "edit-btn";
+                        editButton.textContent = "Изменить";
+                        editButton.style.marginLeft = "10px";
+
+                        editButton.addEventListener("click", () => {
+                            showInputModal("Выберите роль (Читатель/Писатель):", (newRole) => {
+                                if (newRole !== "Читатель" && newRole !== "Писатель") {
+                                    showInfoModal("Неверная роль. Используйте 'Читатель' или 'Писатель'.");
+                                    return;
+                                }
+
+                                // Обновляем роль на сервере
+                                fetch(`/api/access/set`, {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        documentId,
+                                        userEmail: user.email,
+                                        permissionId: newRole === "Читатель" ? 2 : 3
+                                    })
+                                }).then(async response => {
+                                    if (response.ok) {
+                                        userInfo.textContent = `${user.email} - ${newRole}`;
+                                    } else {
+                                        showInfoModal(await response.text());
+                                    }
+                                }).catch(async error => {
+                                    console.error(error);
+                                    showInfoModal(await response.text());
+                                });
+                            })
+                        });
+
+                        const deleteButton = document.createElement("button");
+                        deleteButton.className = "delete-btn";
+                        deleteButton.textContent = "Удалить";
+                        deleteButton.style.marginLeft = "10px";
+
+                        deleteButton.addEventListener("click", async () => {
+                            try {
+                                const response = await fetch(`/api/access/delete`, {
+                                    method: "DELETE",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        userEmail: user.email,
+                                        documentId
+                                    })
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error('Ошибка удаления доступа');
+                                }
+
+                                // Удаляем пользователя из списка
+                                userItem.remove();
+                            } catch (error) {
+                                console.error(error);
+                                showInfoModal("Не удалось удалить доступ");
+                            }
+                        });
+
+                        userItem.appendChild(userInfo);
+                        userItem.appendChild(editButton);
+                        userItem.appendChild(deleteButton);
+                    } else {
+                        userItem.appendChild(userInfo);
+                    }
+
+                    modalBody.appendChild(userItem);
+                });
+
+                // Открываем модальное окно
+                modal.style.display = "flex";
+            } catch (error) {
+                console.error(error);
+                alert("Не удалось загрузить данные о доступе");
+            }
+        });
+
+// Закрытие модального окна
+        document.getElementById("closeModalBtn").addEventListener("click", () => {
+            document.getElementById("accessModal").style.display = "none";
+        });
+
+// Логика создания нового доступа
+        document.getElementById("createAccessBtn").addEventListener("click", async () => {
+            const emailInput = document.getElementById("emailInput");
+            const userEmail = emailInput.value.trim();
+
+            if (!userEmail) {
+                showInfoModal("Введите email перед созданием доступа.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/access/create`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        documentId,
+                        userEmail,
+                        permissionId: 2
+                    })
+                });
+
+                if (!response.ok) {
+                    showInfoModal(await response.text());
+                } else {
+                    emailInput.value = ""; // Очищаем поле после успешного добавления
+                    accessSettingsButton.click(); // Перезагружаем список пользователей
+                }
+            } catch (error) {
+                console.error(error);
+                showInfoModal("Не удалось создать доступ");
+            }
+        });
+
+        await fetchUserName();
+        await fetchDocument(documentId);
+    });
+</script>
+</body>
+</html>

@@ -24,7 +24,7 @@ public class CreateSetAccessFilter(IAccessService accessService) : IAsyncActionF
             if (!checkMasterResult.IsSuccess)
                 context.Result = new BadRequestObjectResult(checkAccessResult.Error!.Message);
         
-            if (request.PermissionId < (int)Permissions.Master)
+            if (request.PermissionId == (int)Permissions.Master)
                 context.Result = new BadRequestObjectResult(
                     "Нельзя присвоить обычному пользователю такие возможности!");
         }

@@ -32,11 +32,10 @@ builder.Services.AddDbContext<WebDbContext>(
 
 builder.Services.AddControllers();
 builder.Services.AddLogging();
-
-builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterValidationRules>();;
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterValidationRules>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
@@ -79,6 +78,8 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app.MapControllers();
 

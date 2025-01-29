@@ -77,7 +77,7 @@ public class DocumentService(
         
         var lines = mdText == string.Empty 
             ? [string.Empty] 
-            : mdText.Split(Environment.NewLine);
+            : mdText.Split("\n");
         var htmlCode = (await mdService.ConvertToHtml(lines[0])).Value;
 
         for (var index = 1; index < lines.Length; index++)
@@ -87,7 +87,7 @@ public class DocumentService(
             if (!tmpResult.IsSuccess)
                 return tmpResult;
             
-            htmlCode += Environment.NewLine + tmpResult.Value;
+            htmlCode += "<br>" + tmpResult.Value;
         }
         
         return Result<string>.Success(htmlCode!);

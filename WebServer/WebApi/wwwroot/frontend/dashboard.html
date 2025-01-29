@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #1e1e1e;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .user-name {
+            font-size: 1.5rem;
+            margin-right: auto;
+            margin-left: 26%;
+        }
+        .header .actions {
+            display: flex;
+            align-items: center;
+        }
+        .header .actions .btn {
+            margin-left: 10px;
+        }
+        .btn {
+            padding: 12px 20px;
+            font-size: 1rem;
+            color: #ffffff;
+            background-color: #6200ea;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #3700b3;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+        }
+        .document-list {
+            width: 60%;
+            max-width: 600px;
+            list-style: none;
+            padding: 0;
+            position: relative;
+        }
+        .document-item {
+            padding: 15px;
+            background: #1e1e1e;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            transition: background 0.3s;
+        }
+        .document-item:hover {
+            background: #2c2c2c;
+        }
+        .document-item span:first-child {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .delete-btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            color: #ffffff;
+            background-color: #6200ea;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .delete-btn:hover {
+            background-color: #3700b3;
+        }
+        .create-form {
+            display: none;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            width: 50%;
+            max-width: 600px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        .create-form input {
+            width: 96%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #2c2c2c;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            border-radius: 6px;
+        }
+        .create-form button {
+            padding: 12px;
+            background-color: #6200ea;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #ffffff;
+            width: 100%;
+        }
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background-color: #6200ea;
+            color: #ffffff;
+            border: none;
+            font-size: 16px;
+            text-align: center;
+            line-height: 16px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        .close-btn:hover {
+            background-color: #3700b3;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Markdown-редактор</h1>
+    <span class="user-name" id="userName">Загрузка...</span>
+    <div class="actions">
+        <button class="btn" id="createDocument">Создать</button>
+        <button class="btn" id="logoutButton">Выйти</button>
+    </div>
+</div>
+<div class="container">
+    <ul class="document-list" id="documentList"></ul>
+    <div class="create-form" id="createForm">
+        <button class="close-btn" id="closeForm">×</button>
+        <input type="text" id="documentTitle" placeholder="Введите название документа" required>
+        <button id="createButton">Создать</button>
+        <div id="errorMessage" style="color: red; margin-top: 10px;"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const documentList = document.getElementById("documentList");
+        const createForm = document.getElementById("createForm");
+        const createDocumentButton = document.getElementById("createDocument");
+        const createButton = document.getElementById("createButton");
+        const closeFormButton = document.getElementById("closeForm");
+        const errorMessage = document.getElementById("errorMessage");
+        const userNameElement = document.getElementById("userName");
+        const logoutButton = document.getElementById("logoutButton");
+
+        // Логика выхода из аккаунта
+        logoutButton.addEventListener("click", () => {
+            // Удаление всех куки
+            document.cookie.split(";").forEach(cookie => {
+                document.cookie = cookie
+                    .replace(/^ +/, "") // Удаляем пробелы
+                    .replace(/=.*/, "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/"); // Устанавливаем истекшую дату
+            });
+
+            // Перенаправление на главную страницу
+            window.location.href = "/";
+        });
+
+        // Получение документов с сервера
+        async function fetchDocuments() {
+            try {
+                const response = await fetch('api/user/documents');
+                if (response.status === 401) {
+                    // Если статус 401, перенаправляем на главную страницу
+                    window.location.href = '/';
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки документов');
+                }
+
+                const documents = await response.json();
+                renderDocuments(documents);
+            } catch (error) {
+                console.error(error);
+                documentList.innerHTML = '<li>Не удалось загрузить документы</li>';
+            }
+        }
+
+        // Получение имени пользователя с сервера
+        async function fetchUserName() {
+            try {
+                const response = await fetch('/api/user/name');
+                if (response.status === 401) {
+                    // Если статус 401, перенаправляем на главную страницу
+                    window.location.href = '/';
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки имени пользователя');
+                }
+
+                userNameElement.textContent = JSON.parse(await response.text());
+            } catch (error) {
+                console.error(error);
+                userNameElement.textContent = 'Не удалось загрузить имя пользователя';
+            }
+        }
+
+        // Удаление документа
+        async function deleteDocument(documentId) {
+            try {
+                const response = await fetch('api/document/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ DocumentId: documentId })
+                });
+
+                if (response.status === 401) {
+                    // Если статус 401, перенаправляем на главную страницу
+                    window.location.href = '/';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при удалении документа');
+                }
+
+                // Обновляем список документов
+                await fetchDocuments();
+            } catch (error) {
+                console.error(error);
+                alert('Не удалось удалить документ');
+            }
+        }
+
+        // Создание документа
+        async function createDocument(title) {
+            try {
+                const response = await fetch('api/document/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title })
+                });
+
+                if (response.status === 401) {
+                    // Если статус 401, перенаправляем на главную страницу
+                    window.location.href = '/';
+                    return;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка при создании документа');
+                }
+
+                await fetchDocuments(); // Обновляем список документов
+                createForm.style.display = 'none'; // Закрываем форму
+                errorMessage.textContent = ''; // Очищаем сообщение об ошибке
+            } catch (error) {
+                errorMessage.textContent = error.message; // Показываем сообщение об ошибке
+            }
+        }
+
+        // Отображение документов
+        function renderDocuments(documents) {
+            documentList.innerHTML = '';
+            documents.forEach(doc => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("document-item");
+
+                listItem.innerHTML = `
+                    <span>${doc.title}</span>
+                    <span>${new Date(doc.created).toLocaleString()}</span>
+                    <button class="delete-btn" data-id="${doc.documentId}">Удалить</button>
+                `;
+
+                // Навешиваем обработчики
+                listItem.addEventListener("click", () => {
+                    window.location.href = `/redactor/${doc.documentId}`;
+                });
+
+                listItem.querySelector(".delete-btn").addEventListener("click", (e) => {
+                    e.stopPropagation(); // Останавливаем всплытие события
+                    deleteDocument(doc.documentId); // Удаление документа
+                });
+
+                documentList.appendChild(listItem);
+            });
+        }
+
+        // Открыть форму для создания документа
+        createDocumentButton.addEventListener("click", () => {
+            createForm.style.display = 'block';
+        });
+
+        // Закрыть форму
+        closeFormButton.addEventListener("click", () => {
+            createForm.style.display = 'none';
+            errorMessage.textContent = '';
+        });
+
+        // Обработчик кнопки создания документа
+        createButton.addEventListener("click", () => {
+            const title = document.getElementById("documentTitle").value;
+            if (title.trim() !== "") {
+                createDocument(title);
+            } else {
+                errorMessage.textContent = "Название документа не может быть пустым.";
+            }
+        });
+
+        // Инициализация
+        await fetchUserName();
+        await fetchDocuments();
+    });
+</script>
+</body>
+</html>

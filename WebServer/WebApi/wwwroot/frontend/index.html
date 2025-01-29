@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .container {
+            text-align: center;
+            background: #1e1e1e;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            width: 340px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+        button {
+            display: block;
+            width: 200px;
+            padding: 12px;
+            margin: 10px auto;
+            font-size: 1rem;
+            color: #ffffff;
+            background-color: #6200ea;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3700b3;
+        }
+        .form {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+        }
+        input:focus {
+            border-color: #6200ea;
+            outline: none;
+        }
+        .error {
+            color: #ff5252;
+            font-size: 0.875rem;
+            margin-top: -10px;
+        }
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #333;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+        }
+        .close:hover {
+            background: #444;
+        }
+        .success-message {
+            margin-top: 20px;
+            color: #4caf50;
+            font-size: 1rem;
+        }
+        .error-message {
+            margin-top: 20px;
+            color: #ff5252;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <button class="close" id="closeForm" style="display: none;">&times;</button>
+    <h1 id="header">Markdown-редактор</h1>
+    <button id="registerButton">Регистрация</button>
+    <button id="loginButton">Авторизация</button>
+
+    <form id="registerForm" class="form">
+        <input type="text" id="registerName" placeholder="Введите имя" required>
+        <div id="nameError" class="error"></div>
+        <input type="email" id="registerEmail" placeholder="Введите email" required>
+        <div id="emailError" class="error"></div>
+        <input type="password" id="registerPassword" placeholder="Введите пароль" required>
+        <div id="passwordError" class="error"></div>
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    <form id="loginForm" class="form">
+        <input type="email" id="loginEmail" placeholder="Введите email" required>
+        <div id="loginEmailError" class="error"></div>
+        <input type="password" id="loginPassword" placeholder="Введите пароль" required>
+        <div id="loginPasswordError" class="error"></div>
+        <button type="submit">Войти</button>
+    </form>
+
+    <!-- Сообщения об ошибке и успехе -->
+    <div id="message" class="error-message"></div>
+</div>
+
+<script>
+    const header = document.getElementById('header');
+    const registerButton = document.getElementById('registerButton');
+    const loginButton = document.getElementById('loginButton');
+    const registerForm = document.getElementById('registerForm');
+    const loginForm = document.getElementById('loginForm');
+    const closeForm = document.getElementById('closeForm');
+    const message = document.getElementById('message');
+
+    // Тoggle формы
+    function toggleForms(showForm, title) {
+        header.textContent = title;
+        registerButton.style.display = 'none';
+        loginButton.style.display = 'none';
+        closeForm.style.display = 'flex';
+        registerForm.style.display = showForm === 'register' ? 'flex' : 'none';
+        loginForm.style.display = showForm === 'login' ? 'flex' : 'none';
+        message.textContent = ''; // Очистить сообщение при переключении
+    }
+
+    // Сброс на начальные состояния
+    function resetToDefault() {
+        header.textContent = 'Markdown-редактор';
+        registerButton.style.display = 'block';
+        loginButton.style.display = 'block';
+        closeForm.style.display = 'none';
+        registerForm.style.display = 'none';
+        loginForm.style.display = 'none';
+        message.textContent = ''; // Очистить сообщение
+    }
+
+    // Открыть форму регистрации
+    registerButton.addEventListener('click', () => toggleForms('register', 'Регистрация'));
+
+    // Открыть форму авторизации
+    loginButton.addEventListener('click', () => toggleForms('login', 'Авторизация'));
+
+    // Закрыть форму
+    closeForm.addEventListener('click', resetToDefault);
+
+    // Обработчик отправки формы регистрации
+    // Обработчик отправки формы регистрации
+    registerForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Отключить стандартную отправку формы
+
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+
+        const response = await fetch('/api/user/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        // Очистка старых ошибок
+        document.getElementById('nameError').textContent = '';
+        document.getElementById('emailError').textContent = '';
+        document.getElementById('passwordError').textContent = '';
+        message.textContent = ''; // Очистить сообщение об ошибке/успехе
+
+        // Если есть ошибка, выводим её
+        if (response.status !== 200) {
+            // Пробуем распарсить ошибку, если она есть
+            let data = await response.text();
+            try {
+                data = JSON.parse(data);
+            } catch (e) {
+                // Если не удалось распарсить, просто оставляем как текст
+            }
+
+            message.textContent = data || 'Произошла ошибка при регистрации';
+            message.classList.remove('success-message');
+            message.classList.add('error-message');
+        } else {
+            message.textContent = 'Регистрация прошла успешно!';
+            message.classList.remove('error-message');
+            message.classList.add('success-message');
+
+            // Закрываем форму после успешной регистрации
+            setTimeout(resetToDefault, 2000); // Закрываем форму через 2 секунды после успешной регистрации
+        }
+    });
+    // Обработчик отправки формы авторизации
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Отключить стандартную отправку формы
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        const response = await fetch('/api/user/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        // Очистка старых ошибок
+        document.getElementById('loginEmailError').textContent = '';
+        document.getElementById('loginPasswordError').textContent = '';
+        message.textContent = ''; // Очистить сообщение об ошибке/успехе
+
+        // Если есть ошибка, выводим её
+        if (response.status !== 200) {
+            let data = await response.text();
+            try {
+                data = JSON.parse(data);
+            } catch (e) {
+                // Если не удалось распарсить, просто оставляем как текст
+            }
+
+            message.textContent = data || 'Произошла ошибка при авторизации';
+            message.classList.remove('success-message');
+            message.classList.add('error-message');
+        } else {
+            // Перенаправляем на страницу /dashboard
+            window.location.href = '/dashboard';
+        }
+    });
+</script>
+</body>
+</html>

@@ -33,20 +33,19 @@ public class DocumentController(IDocumentService documentService) : ControllerBa
             : Results.Ok(createDocumentResult.Value);
     }
 
-    [HttpGet("get")]
+    [HttpGet("get/{documentId:guid}")]
     [ServiceFilter(typeof(DocumentGetFilter))]
-    public async Task<IResult> Get([FromQuery] DocumentIdRequest request, 
-        [FromServices] IMinioService minioService)
+    public async Task<IResult> Get(Guid documentId, [FromServices] IMinioService minioService)
     {
-        var getContentResult = await minioService.PullDocument(request.DocumentId);
+        var getContentResult = await minioService.PullDocument(documentId);
         if (!getContentResult.IsSuccess)
             return ErrorSwitcher.SwitchError(getContentResult.Error!);
         
-        var getDocumentInfoResult = await documentService.Get(request.DocumentId);
+        var getDocumentInfoResult = await documentService.Get(documentId);
         if (!getDocumentInfoResult.IsSuccess)
             return ErrorSwitcher.SwitchError(getDocumentInfoResult.Error!);
         
-        var convertResult = await documentService.ConvertToHtml(request.DocumentId, getContentResult.Value!);
+        var convertResult = await documentService.ConvertToHtml(documentId, getContentResult.Value!);
         return convertResult.IsSuccess 
             ? Results.Ok(new DocumentRedactorDto
             {
