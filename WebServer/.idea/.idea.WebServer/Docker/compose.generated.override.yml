@@ -1,0 +1,23 @@
+# This is a generated file. Not intended for manual editing.
+version: "3.8"
+services:
+  api:
+    build:
+      context: "C:\\Users\\abdul\\Homework\\clean-code\\WebServer"
+      dockerfile: "WebApi/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/WebApi.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net8.0/WebApi.staticwebassets.runtime.CT.json"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "api:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\abdul\\Homework\\clean-code\\WebServer\\WebApi:/app:rw"
+    - "C:\\Users\\abdul\\Homework\\clean-code\\WebServer:/src:rw"
+    - "C:\\Users\\abdul\\.nuget\\packages:/root/.nuget/packages"
+    working_dir: "/app"
