@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text;
 using Application.Dto;
 using Application.Interfaces.Services;
 using Application.Utils;
@@ -81,5 +82,26 @@ public class DocumentController(IDocumentService documentService) : ControllerBa
         return renameResult.IsSuccess 
             ? Results.Ok() 
             : ErrorSwitcher.SwitchError(renameResult.Error!);
+    }
+    
+    [HttpGet("download/{documentId:guid}")]
+    public async Task<IResult> Download(Guid documentId, [FromServices] IMinioService minioService)
+    {
+        var pullResult = await minioService.PullDocument(documentId);
+        if (!pullResult.IsSuccess)
+            return ErrorSwitcher.SwitchError(pullResult.Error!);
+        
+        var convertResult = await documentService.ConvertToHtml(documentId, pullResult.Value!);
+        if (!convertResult.IsSuccess)
+            return ErrorSwitcher.SwitchError(convertResult.Error!);
+
+        var addResult = await documentService.AddToMaket(documentId, convertResult.Value!);
+        if (!addResult.IsSuccess)
+            return ErrorSwitcher.SwitchError(addResult.Error!);
+        
+        var fileBytes = Encoding.UTF8.GetBytes(addResult.Value!);
+        var fileName = $"{documentId}.html";
+        
+        return Results.File(fileBytes, "text/html", fileName);
     }
 }

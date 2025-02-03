@@ -13,4 +13,5 @@ public interface IDocumentService
     Task<Result<MdDocument>> Get(Guid documentId);
     Task<Result<IEnumerable<MdDocument>>> GetUserDocuments(Guid userId);
     Task<Result<IEnumerable<MdDocument>>> GetUserPermission(Guid userId);
+    Task<Result<string>> AddToMaket(Guid documentId, string htmlCode);
 }

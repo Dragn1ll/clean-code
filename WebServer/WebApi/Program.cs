@@ -19,18 +19,17 @@ using WebApi.Validation;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
-    .AddJsonFile("appsettings.Secrets.json", optional: true, reloadOnChange: true);
+    .AddEnvironmentVariables();
 
 var services = builder.Services;
 
 services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 services.Configure<MinioOptions>(builder.Configuration.GetSection("Minio"));
 services.AddApiAuthentication(builder.Configuration);
-services.AddDbContext<WebDbContext>(
-    options =>
-    {
-        options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(WebDbContext)));
-    });
+services.AddDbContext<WebDbContext>(options => 
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(WebDbContext)));
+});
 
 services.AddControllers();
 services.AddLogging();

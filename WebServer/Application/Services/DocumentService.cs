@@ -1,4 +1,3 @@
-using Application.Dto;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Utils;
@@ -144,5 +143,24 @@ public class DocumentService(
     public async Task<Result<IEnumerable<MdDocument>>> GetUserPermission(Guid userId)
     {
         return await documentsRepository.GetByUserPermission(userId);
+    }
+
+    public async Task<Result<string>> AddToMaket(Guid documentId, string htmlCode)
+    {
+        var getResult = await Get(documentId);
+        return !getResult.IsSuccess 
+            ? Result<string>.Failure(getResult.Error) 
+            : Result<string>.Success($"""
+                                     <!DOCTYPE html>
+                                     <html lang="en">
+                                     <head>
+                                         <meta charset="UTF-8">
+                                         <title>{getResult.Value!.Title}</title>
+                                     </head>
+                                     <body>
+                                         {htmlCode}
+                                     </body>
+                                     </html>
+                                     """);
     }
 }
