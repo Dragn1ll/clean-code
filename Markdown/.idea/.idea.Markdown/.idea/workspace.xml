@@ -10,24 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1a534735-ac62-48ac-9a7e-17e773457c57" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Markdown/Classes/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/Classes/Parser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Markdown/Classes/Renderer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/Classes/Renderer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Markdown/Interfaces/IParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/Interfaces/IParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Markdown/Interfaces/IRenderer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/Interfaces/IRenderer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Markdown/MarkdownProcessor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Markdown/MarkdownProcessor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MarkdownTest/MarkdownProcessorShouldTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MarkdownTest/MarkdownProcessorShouldTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IDocumentService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IDocumentService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IUserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Interfaces/Services/IUserService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Services/DocumentService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Services/DocumentService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Application/Services/UserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Application/Services/UserService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Core/Models/MdDocument.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Core/Models/MdDocument.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Core/Models/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Core/Models/User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/AccessesRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/AccessesRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/UsersRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/Repositories/UsersRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/WebDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/Persistence/DataAccess/WebDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/WebApi/Controllers/DocumentController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/WebApi/Controllers/DocumentController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/WebApi/Controllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/WebApi/Controllers/UserController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../WebServer/WebApi/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/WebApi/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Markdown/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Markdown/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../WebServer/.env" beforeDir="false" afterPath="$PROJECT_DIR$/../WebServer/.env" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,6 +139,7 @@
       <workItem from="1738011416444" duration="85000" />
       <workItem from="1738011606124" duration="241000" />
       <workItem from="1738540405334" duration="151000" />
+      <workItem from="1738594480221" duration="1350000" />
     </task>
     <task id="LOCAL-00001" summary="сделал из консольного приложения библиотеку и изменил тесты, а также внёс некоторые поправки исходя из ревью">
       <option name="closed" value="true" />
