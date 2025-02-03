@@ -169,7 +169,55 @@
     // Закрыть форму
     closeForm.addEventListener('click', resetToDefault);
 
-    // Обработчик отправки формы регистрации
+    // Валидация для регистрации
+    function validateRegistrationForm(name, email, password) {
+        let isValid = true;
+
+        // Очистка предыдущих ошибок
+        document.getElementById('nameError').textContent = '';
+        document.getElementById('emailError').textContent = '';
+        document.getElementById('passwordError').textContent = '';
+
+        // Проверка имени: не пустое, минимум 4 символа, максимум 20 символов.
+        if (!name.trim()) {
+            document.getElementById('nameError').textContent = 'Имя обязательно!';
+            isValid = false;
+        } else if (name.trim().length < 4) {
+            document.getElementById('nameError').textContent = 'Имя минимум 4 символа!';
+            isValid = false;
+        } else if (name.trim().length > 20) {
+            document.getElementById('nameError').textContent = 'Имя максимум 20 символов!';
+            isValid = false;
+        }
+
+        // Проверка email: не пустое и соответствует формату email.
+        if (!email.trim()) {
+            document.getElementById('emailError').textContent = 'Электронная почта обязательна!';
+            isValid = false;
+        } else {
+            // Простейшая регулярка для проверки email.
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email.trim())) {
+                document.getElementById('emailError').textContent = 'Нарушен формат электронной почты!';
+                isValid = false;
+            }
+        }
+
+        // Проверка пароля: не пустое, минимум 8 символов, максимум 25 символов.
+        if (!password) {
+            document.getElementById('passwordError').textContent = 'Пароль обязателен!';
+            isValid = false;
+        } else if (password.length < 8) {
+            document.getElementById('passwordError').textContent = 'Пароль должен быть минимум 8 символов!';
+            isValid = false;
+        } else if (password.length > 25) {
+            document.getElementById('passwordError').textContent = 'Пароль должен быть максимум 25 символов!';
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
     // Обработчик отправки формы регистрации
     registerForm.addEventListener('submit', async (event) => {
         event.preventDefault(); // Отключить стандартную отправку формы
@@ -177,6 +225,14 @@
         const name = document.getElementById('registerName').value;
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
+
+        // Проверка данных по аналогии с правилами на C#
+        if (!validateRegistrationForm(name, email, password)) {
+            return; // Если данные не прошли валидацию, не отправляем запрос
+        }
+
+        // Очистка старых сообщений об ошибках
+        message.textContent = '';
 
         const response = await fetch('/api/user/register', {
             method: 'POST',
@@ -186,22 +242,15 @@
             body: JSON.stringify({ name, email, password })
         });
 
-        // Очистка старых ошибок
-        document.getElementById('nameError').textContent = '';
-        document.getElementById('emailError').textContent = '';
-        document.getElementById('passwordError').textContent = '';
-        message.textContent = ''; // Очистить сообщение об ошибке/успехе
-
         // Если есть ошибка, выводим её
         if (response.status !== 200) {
             // Пробуем распарсить ошибку, если она есть
-            let data = await response.text();
+            let data = await JSON.parse(await response.json());
             try {
                 data = JSON.parse(data);
             } catch (e) {
                 // Если не удалось распарсить, просто оставляем как текст
             }
-
             message.textContent = data || 'Произошла ошибка при регистрации';
             message.classList.remove('success-message');
             message.classList.add('error-message');
@@ -211,15 +260,21 @@
             message.classList.add('success-message');
 
             // Закрываем форму после успешной регистрации
-            setTimeout(resetToDefault, 2000); // Закрываем форму через 2 секунды после успешной регистрации
+            setTimeout(resetToDefault, 2000);
         }
     });
+
     // Обработчик отправки формы авторизации
     loginForm.addEventListener('submit', async (event) => {
         event.preventDefault(); // Отключить стандартную отправку формы
 
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
+
+        // Очистка старых ошибок
+        document.getElementById('loginEmailError').textContent = '';
+        document.getElementById('loginPasswordError').textContent = '';
+        message.textContent = ''; // Очистить сообщение
 
         const response = await fetch('/api/user/login', {
             method: 'POST',
@@ -229,11 +284,6 @@
             body: JSON.stringify({ email, password })
         });
 
-        // Очистка старых ошибок
-        document.getElementById('loginEmailError').textContent = '';
-        document.getElementById('loginPasswordError').textContent = '';
-        message.textContent = ''; // Очистить сообщение об ошибке/успехе
-
         // Если есть ошибка, выводим её
         if (response.status !== 200) {
             let data = await response.text();
@@ -242,7 +292,6 @@
             } catch (e) {
                 // Если не удалось распарсить, просто оставляем как текст
             }
-
             message.textContent = data || 'Произошла ошибка при авторизации';
             message.classList.remove('success-message');
             message.classList.add('error-message');

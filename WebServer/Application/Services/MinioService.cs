@@ -116,4 +116,26 @@ public class MinioService : IMinioService
             return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
+    
+    public async Task<Result<bool>> DocumentExists(Guid documentId)
+    {
+        try
+        {
+            var objectName = $"{documentId}.txt";
+
+            await _minioClient.StatObjectAsync(new StatObjectArgs()
+                .WithBucket(_minioConfig.BucketName)
+                .WithObject(objectName));
+
+            return Result<bool>.Success(true);
+        }
+        catch (Minio.Exceptions.ObjectNotFoundException)
+        {
+            return Result<bool>.Success(false);
+        }
+        catch (Exception exception)
+        {
+            return Result<bool>.Failure(new Error(ErrorType.ServerError, exception.Message));
+        }
+    }
 }

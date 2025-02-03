@@ -8,4 +8,5 @@ public interface IMinioService
     Task<Result<string>> PullDocument(Guid documentId); 
     Task<Result> PushDocument(Guid documentId, string content);
     Task<Result> DeleteDocument(Guid documentId);
+    Task<Result<bool>> DocumentExists(Guid documentId);
 }

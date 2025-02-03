@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using Application.Dto;
+using Application.Interfaces.Auth;
 using Application.Interfaces.Services;
+using Application.Utils;
+using Core.Enum;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +14,7 @@ namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/user")]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController(IUserService userService, IPasswordHasher passwordHasher) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<IResult> Register([FromBody] RegisterUserRequest request, 
@@ -32,7 +35,18 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpPost("login")]
     public async Task<IResult> Login([FromBody] LoginUserRequest request)
     {
-        var loginResult = await userService.Login(request.Email, request.Password);
+        var getResult = await userService.GetByEmail(request.Email); 
+        if (!getResult.IsSuccess || getResult.Value == null)
+            return ErrorSwitcher.SwitchError(new Error(ErrorType.BadRequest, 
+                "Не существует аккаунта с таким email!"));
+        
+        var user = getResult.Value;
+        var passwordIsValid = passwordHasher.Validate(request.Password, user!.Password);
+
+        if (!passwordIsValid)
+            return ErrorSwitcher.SwitchError(new Error(ErrorType.BadRequest, "Неправильный пароль!"));
+        
+        var loginResult = await userService.Login(user);
 
         if (!loginResult.IsSuccess) return ErrorSwitcher.SwitchError(loginResult.Error!);
         

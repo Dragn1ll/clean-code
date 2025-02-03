@@ -27,24 +27,34 @@ public class DocumentService(
         return Result.Success();
     }
     
-    public async Task<Result<Guid>> Create(Guid userId, string title)
+    public async Task<Result<Guid>> Create(Guid userId, string title, IAccessService accessService)
     {
-        var result = await documentsRepository.Create(userId, title);
+        var document = new MdDocument(Guid.NewGuid(), userId, title, DateTime.Now);
         
-        if (!result.IsSuccess)
-            return result;
-
         try
         {
-            await minioService.CreateDocument(result.Value);
+            await minioService.CreateDocument(document.Id);
         }
         catch (Exception exception)
         {
-            await documentsRepository.Delete(result.Value);
+            await documentsRepository.Delete(document.Id);
             return Result<Guid>.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
         
-        return result;
+        var checkResult = await minioService.DocumentExists(document.Id);
+        if (!checkResult.IsSuccess || checkResult.Value == false)
+            return Result<Guid>.Failure(new Error(ErrorType.ServerError, 
+                "Не удалось создать документ из-за неполадок на сервере!"));
+        
+        var result = await documentsRepository.Create(document);
+        if (!result.IsSuccess)
+            return Result<Guid>.Failure(result.Error);
+        
+        var createAccessResult = await accessService.Create(userId, document.Id, 
+            Permissions.Master);
+        return !createAccessResult.IsSuccess 
+            ? Result<Guid>.Failure(createAccessResult.Error) 
+            : Result<Guid>.Success(document.Id);
     }
 
     public async Task<Result> Delete(Guid documentId)
@@ -75,8 +85,8 @@ public class DocumentService(
         if (!checkResult.IsSuccess)
             return Result<string>.Failure(checkResult.Error);
         
-        var lines = mdText == string.Empty 
-            ? [string.Empty] 
+        var lines = string.IsNullOrEmpty(mdText)
+            ? [string.Empty]
             : mdText.Split("\n");
         var htmlCode = (await mdService.ConvertToHtml(lines[0])).Value;
 
@@ -108,7 +118,22 @@ public class DocumentService(
         if (!checkResult.IsSuccess)
             return Result<MdDocument>.Failure(checkResult.Error);
         
-        return await documentsRepository.GetById(documentId);
+        var checkFileResult = await minioService.DocumentExists(documentId);
+        if (!checkResult.IsSuccess || checkFileResult.Value == false)
+            return Result<MdDocument>.Failure(new Error(ErrorType.ServerError, 
+                "Не удалось получить документ из-за неполадок на сервере!"));
+        
+        var getContentResult = await minioService.PullDocument(documentId);
+        if (!getContentResult.IsSuccess)
+            return Result<MdDocument>.Failure(getContentResult.Error!);
+        
+        var getResult = await documentsRepository.GetById(documentId);
+        if (!getResult.IsSuccess)
+            return Result<MdDocument>.Failure(getResult.Error);
+        
+        getResult.Value!.Text = getContentResult.Value!;
+
+        return getResult;
     }
 
     public async Task<Result<IEnumerable<MdDocument>>> GetUserDocuments(Guid userId)

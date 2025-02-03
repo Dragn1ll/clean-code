@@ -6,4 +6,6 @@ public class MdDocument(Guid id, Guid authorId, string title, DateTime creationD
     public Guid AuthorId { get; } = authorId;
     public string Title { get; } = title;
     public DateTime CreationDate { get; } = creationDate;
+
+    public string Text { get; set; }
 }

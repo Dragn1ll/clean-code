@@ -10,25 +10,25 @@ namespace Persistence.DataAccess.Repositories;
 
 public class DocumentsRepository(WebDbContext dbContext) : IDocumentsRepository
 {
-    public async Task<Result<Guid>> Create(Guid userId, string title)
+    public async Task<Result> Create(MdDocument mdDocument)
     {
         try
         {
             var documentEntity = new DocumentEntity
             {
-                Id = Guid.NewGuid(),
-                Title = title,
-                AuthorId = userId
+                Id = mdDocument.Id,
+                Title = mdDocument.Title,
+                AuthorId = mdDocument.AuthorId
             };
             
             await dbContext.Documents.AddAsync(documentEntity);
             await dbContext.SaveChangesAsync();
         
-            return Result<Guid>.Success(documentEntity.Id);
+            return Result.Success();
         }
         catch (Exception exception)
         {
-            return Result<Guid>.Failure(new Error(ErrorType.ServerError, exception.Message));
+            return Result.Failure(new Error(ErrorType.ServerError, exception.Message));
         }
     }
 

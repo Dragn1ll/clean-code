@@ -21,42 +21,44 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .AddJsonFile("appsettings.Secrets.json", optional: true, reloadOnChange: true);
 
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
-builder.Services.Configure<MinioOptions>(builder.Configuration.GetSection("Minio"));
-builder.Services.AddApiAuthentication(builder.Configuration);
-builder.Services.AddDbContext<WebDbContext>(
+var services = builder.Services;
+
+services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
+services.Configure<MinioOptions>(builder.Configuration.GetSection("Minio"));
+services.AddApiAuthentication(builder.Configuration);
+services.AddDbContext<WebDbContext>(
     options =>
     {
         options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(WebDbContext)));
     });
 
-builder.Services.AddControllers();
-builder.Services.AddLogging();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+services.AddControllers();
+services.AddLogging();
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
-builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterValidationRules>();
+services.AddScoped<IValidator<RegisterUserRequest>, RegisterValidationRules>();
 
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IDocumentService, DocumentService>();
-builder.Services.AddScoped<IMinioService, MinioService>();
-builder.Services.AddScoped<IMdService, MdService>();
-builder.Services.AddScoped<IAccessService, AccessService>();
+services.AddScoped<IUserService, UserService>();
+services.AddScoped<IDocumentService, DocumentService>();
+services.AddScoped<IMinioService, MinioService>();
+services.AddScoped<IMdService, MdService>();
+services.AddScoped<IAccessService, AccessService>();
 
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<IDocumentsRepository, DocumentsRepository>();
-builder.Services.AddScoped<IAccessRepository, AccessesRepository>();
+services.AddScoped<IUsersRepository, UsersRepository>();
+services.AddScoped<IDocumentsRepository, DocumentsRepository>();
+services.AddScoped<IAccessRepository, AccessesRepository>();
 
-builder.Services.AddScoped<IJwtWorker, JwtWorker>();
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+services.AddScoped<IJwtWorker, JwtWorker>();
+services.AddScoped<IPasswordHasher, PasswordHasher>();
 
-builder.Services.AddScoped<DocumentGetFilter>();
-builder.Services.AddScoped<DocumentDeleteFilter>();
-builder.Services.AddScoped<DocumentChangeFilter>();
-builder.Services.AddScoped<DocumentRenameFilter>();
-builder.Services.AddScoped<CreateSetAccessFilter>();
-builder.Services.AddScoped<DeleteAccessFilter>();
-builder.Services.AddScoped<GetAccessFilter>();
+services.AddScoped<DocumentGetFilter>();
+services.AddScoped<DocumentDeleteFilter>();
+services.AddScoped<DocumentChangeFilter>();
+services.AddScoped<DocumentRenameFilter>();
+services.AddScoped<CreateSetAccessFilter>();
+services.AddScoped<DeleteAccessFilter>();
+services.AddScoped<GetAccessFilter>();
 
 var app = builder.Build();
 
@@ -75,15 +77,15 @@ app.UseCookiePolicy(new CookiePolicyOptions
 
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+    var service = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<WebDbContext>();
+        var context = service.GetRequiredService<WebDbContext>();
         context.Database.Migrate();
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
+        var logger = service.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Ошибка при применении миграций.");
     }
 }

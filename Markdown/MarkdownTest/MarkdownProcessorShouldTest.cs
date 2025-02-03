@@ -13,39 +13,39 @@ public class MarkdownProcessorShouldTest
     }
 
     [Test]
-    public void ConvertToHtml_ShouldOutputItalicString()
+    public async Task ConvertToHtml_ShouldOutputItalicString()
     {
         const string input = "_курсив_";
         const string expected = "<em>курсив</em>";
-        var output = _markdownProcessor.ConvertToHtml(input);
+        var output = await _markdownProcessor.ConvertToHtml(input);
 
         Assert.That(output, Is.EqualTo(expected));
     }
 
     [Test]
-    public void ConvertToHtml_ShouldOutputBoldString()
+    public async Task ConvertToHtml_ShouldOutputBoldString()
     {
         const string input = "__полужирный__";
         const string expected = "<strong>полужирный</strong>";
-        var output = _markdownProcessor.ConvertToHtml(input);
+        var output = await _markdownProcessor.ConvertToHtml(input);
 
         Assert.That(output, Is.EqualTo(expected));
     }
     
     [TestCase("\\_экранирование_", "_экранирование_")]
     [TestCase("\\__экранирование__", "__экранирование__")]
-    public void ConvertToHtml_ShouldOutputTagsWithoutStyle(string input, string expected)
+    public async Task ConvertToHtml_ShouldOutputTagsWithoutStyle(string input, string expected)
     {
-        var output = _markdownProcessor.ConvertToHtml(input);
+        var output = await _markdownProcessor.ConvertToHtml(input);
 
         Assert.That(output, Is.EqualTo(expected));
     }
     
     [TestCase("[ссылка]()", """<a href="#">ссылка</a>""")]
     [TestCase("[ссылка](www.google.com)", """<a href="www.google.com">ссылка</a>""")]
-    public void ConvertToHtml_ShouldOutputUrl(string input, string expected)
+    public async Task ConvertToHtml_ShouldOutputUrl(string input, string expected)
     {
-        var output = _markdownProcessor.ConvertToHtml(input);
+        var output = await _markdownProcessor.ConvertToHtml(input);
 
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -57,29 +57,29 @@ public class MarkdownProcessorShouldTest
     [TestCase("##### заголовок", "<h5>заголовок</h5>")]
     [TestCase("###### заголовок", "<h6>заголовок</h6>")]
     [TestCase("# заголовок #", "<h1>заголовок</h1>")]
-    public void ConvertToHtml_ShouldOutputTitles(string input, string expected)
+    public async Task ConvertToHtml_ShouldOutputTitles(string input, string expected)
     {
-        var output = _markdownProcessor.ConvertToHtml(input);
+        var output = await _markdownProcessor.ConvertToHtml(input);
 
         Assert.That(output, Is.EqualTo(expected));
     }
 
     [Test]
-    public void ConvertToHtml_ShouldOutputItalicInsideBold()
+    public async Task ConvertToHtml_ShouldOutputItalicInsideBold()
     {
         const string input = "Внутри __двойного выделения _одинарное_ тоже__ работает.";
         const string expected = "Внутри <strong>двойного выделения <em>одинарное</em> тоже</strong> работает.";
-        var output = _markdownProcessor.ConvertToHtml(input);
+        var output = await _markdownProcessor.ConvertToHtml(input);
 
         Assert.That(output, Is.EqualTo(expected));
     }
 
     [Test]
-    public void ConvertToHtml_ShouldOutputBoldInsideItalic()
+    public async Task ConvertToHtml_ShouldOutputBoldInsideItalic()
     {
         const string input = "Но не наоборот — внутри _одинарного __двойное__ не_ работает.";
         const string expected = "Но не наоборот — внутри <em>одинарного __двойное__ не</em> работает.";
-        var output = _markdownProcessor.ConvertToHtml(input);
+        var output = await _markdownProcessor.ConvertToHtml(input);
 
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -95,9 +95,9 @@ public class MarkdownProcessorShouldTest
     [TestCase("<em>не считаются</em>", "<em>не считаются</em>")]
     [TestCase("__пересечения _двойных__ и одинарных_", "__пересечения _двойных__ и одинарных_")]
     [TestCase("__ __", "__ __")]
-    public void ConvertToHtml_ShouldHandleEdgeCases(string input, string expected)
+    public async Task ConvertToHtml_ShouldHandleEdgeCases(string input, string expected)
     {
-        var output = _markdownProcessor.ConvertToHtml(input);
+        var output = await _markdownProcessor.ConvertToHtml(input);
 
         Assert.That(output, Is.EqualTo(expected));
     }

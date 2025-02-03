@@ -9,5 +9,5 @@ public interface IParser
     /// </summary>
     /// <param name="line">Текст файла или путь к нему</param>
     /// <returns>Полученный список токенов</returns>
-    List<Token?> ParseToTokens(ref string line);
+    Task<TokenedLine> ParseToTokens(string line);
 }

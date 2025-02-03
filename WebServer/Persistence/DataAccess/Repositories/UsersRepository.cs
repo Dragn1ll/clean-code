@@ -47,7 +47,7 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
         {
             await dbContext.Users.AddAsync(new UserEntity
             {
-                Id = Guid.NewGuid(),
+                Id = user.Id,
                 Username = user.Name,
                 Email = user.Email,
                 PasswordHash = passwordHasher.Hash(user.Password),
@@ -71,7 +71,7 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(u => u.Email == email);
             
-            return Result<User>.Success(new User(userEntity!.Id, userEntity.Username, 
+            return Result<User>.Success(User.Create(userEntity!.Id, userEntity.Username, 
                 userEntity.Email, userEntity.PasswordHash, (Role)userEntity.RoleId));
         }
         catch (Exception exception)
@@ -88,7 +88,7 @@ public class UsersRepository(WebDbContext dbContext, IPasswordHasher passwordHas
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userId);
             
-            return Result<User>.Success(new User(userEntity!.Id, userEntity.Username, 
+            return Result<User>.Success(User.Create(userEntity!.Id, userEntity.Username, 
                 userEntity.Email, userEntity.PasswordHash, (Role)userEntity.RoleId));
         }
         catch (Exception exception)

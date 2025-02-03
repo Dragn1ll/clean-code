@@ -22,14 +22,9 @@ public class DocumentController(IDocumentService documentService) : ControllerBa
     {
         var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         
-        var createDocumentResult = await documentService.Create(userId, request.Title);
-        if (!createDocumentResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(createDocumentResult.Error!);
-        
-        var createAccessResult = await accessService.Create(userId, createDocumentResult.Value, 
-            Permissions.Master);
-        return !createAccessResult.IsSuccess 
-            ? ErrorSwitcher.SwitchError(createAccessResult.Error!) 
+        var createDocumentResult = await documentService.Create(userId, request.Title, accessService);
+        return !createDocumentResult.IsSuccess 
+            ? ErrorSwitcher.SwitchError(createDocumentResult.Error!) 
             : Results.Ok(createDocumentResult.Value);
     }
 
@@ -37,20 +32,16 @@ public class DocumentController(IDocumentService documentService) : ControllerBa
     [ServiceFilter(typeof(DocumentGetFilter))]
     public async Task<IResult> Get(Guid documentId, [FromServices] IMinioService minioService)
     {
-        var getContentResult = await minioService.PullDocument(documentId);
-        if (!getContentResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(getContentResult.Error!);
+        var getDocumentResult = await documentService.Get(documentId);
+        if (!getDocumentResult.IsSuccess)
+            return ErrorSwitcher.SwitchError(getDocumentResult.Error!);
         
-        var getDocumentInfoResult = await documentService.Get(documentId);
-        if (!getDocumentInfoResult.IsSuccess)
-            return ErrorSwitcher.SwitchError(getDocumentInfoResult.Error!);
-        
-        var convertResult = await documentService.ConvertToHtml(documentId, getContentResult.Value!);
+        var convertResult = await documentService.ConvertToHtml(documentId, getDocumentResult.Value!.Text);
         return convertResult.IsSuccess 
             ? Results.Ok(new DocumentRedactorDto
             {
-                Title = getDocumentInfoResult.Value!.Title,
-                Text = getContentResult.Value!,
+                Title = getDocumentResult.Value!.Title,
+                Text = getDocumentResult.Value!.Text,
                 ConvertedText = convertResult.Value!
             }) 
             : ErrorSwitcher.SwitchError(convertResult.Error!);

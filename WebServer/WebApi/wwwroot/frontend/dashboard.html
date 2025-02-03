@@ -80,7 +80,12 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .delete-btn {
+        .document-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .delete-btn,
+        .rename-btn {
             padding: 8px 16px;
             font-size: 0.9rem;
             color: #ffffff;
@@ -90,7 +95,8 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        .delete-btn:hover {
+        .delete-btn:hover,
+        .rename-btn:hover {
             background-color: #3700b3;
         }
         .create-form {
@@ -157,11 +163,21 @@
 </div>
 <div class="container">
     <ul class="document-list" id="documentList"></ul>
+
+    <!-- Форма создания документа -->
     <div class="create-form" id="createForm">
         <button class="close-btn" id="closeForm">×</button>
         <input type="text" id="documentTitle" placeholder="Введите название документа" required>
         <button id="createButton">Создать</button>
         <div id="errorMessage" style="color: red; margin-top: 10px;"></div>
+    </div>
+
+    <!-- Форма переименования документа -->
+    <div class="create-form" id="renameForm">
+        <button class="close-btn" id="closeRenameForm">×</button>
+        <input type="text" id="renameInput" placeholder="Введите новое название документа" required>
+        <button id="renameButton">Переименовать</button>
+        <div id="renameErrorMessage" style="color: red; margin-top: 10px;"></div>
     </div>
 </div>
 
@@ -176,15 +192,24 @@
         const userNameElement = document.getElementById("userName");
         const logoutButton = document.getElementById("logoutButton");
 
+        // Элементы формы переименования
+        const renameForm = document.getElementById("renameForm");
+        const closeRenameFormButton = document.getElementById("closeRenameForm");
+        const renameInput = document.getElementById("renameInput");
+        const renameButton = document.getElementById("renameButton");
+        const renameErrorMessage = document.getElementById("renameErrorMessage");
+
+        // Для хранения id документа, который требуется переименовать
+        let currentDocumentId = null;
+
         // Логика выхода из аккаунта
         logoutButton.addEventListener("click", () => {
             // Удаление всех куки
             document.cookie.split(";").forEach(cookie => {
                 document.cookie = cookie
-                    .replace(/^ +/, "") // Удаляем пробелы
-                    .replace(/=.*/, "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/"); // Устанавливаем истекшую дату
+                    .replace(/^ +/, "")
+                    .replace(/=.*/, "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/");
             });
-
             // Перенаправление на главную страницу
             window.location.href = "/";
         });
@@ -194,14 +219,12 @@
             try {
                 const response = await fetch('api/user/documents');
                 if (response.status === 401) {
-                    // Если статус 401, перенаправляем на главную страницу
                     window.location.href = '/';
                     return;
                 }
                 if (!response.ok) {
                     throw new Error('Ошибка загрузки документов');
                 }
-
                 const documents = await response.json();
                 renderDocuments(documents);
             } catch (error) {
@@ -215,14 +238,12 @@
             try {
                 const response = await fetch('/api/user/name');
                 if (response.status === 401) {
-                    // Если статус 401, перенаправляем на главную страницу
                     window.location.href = '/';
                     return;
                 }
                 if (!response.ok) {
                     throw new Error('Ошибка загрузки имени пользователя');
                 }
-
                 userNameElement.textContent = JSON.parse(await response.text());
             } catch (error) {
                 console.error(error);
@@ -240,18 +261,13 @@
                     },
                     body: JSON.stringify({ DocumentId: documentId })
                 });
-
                 if (response.status === 401) {
-                    // Если статус 401, перенаправляем на главную страницу
                     window.location.href = '/';
                     return;
                 }
-
                 if (!response.ok) {
                     throw new Error('Ошибка при удалении документа');
                 }
-
-                // Обновляем список документов
                 await fetchDocuments();
             } catch (error) {
                 console.error(error);
@@ -269,23 +285,45 @@
                     },
                     body: JSON.stringify({ title })
                 });
-
                 if (response.status === 401) {
-                    // Если статус 401, перенаправляем на главную страницу
                     window.location.href = '/';
                     return;
                 }
-
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Ошибка при создании документа');
                 }
-
-                await fetchDocuments(); // Обновляем список документов
-                createForm.style.display = 'none'; // Закрываем форму
-                errorMessage.textContent = ''; // Очищаем сообщение об ошибке
+                await fetchDocuments();
+                createForm.style.display = 'none';
+                errorMessage.textContent = '';
             } catch (error) {
-                errorMessage.textContent = error.message; // Показываем сообщение об ошибке
+                errorMessage.textContent = error.message;
+            }
+        }
+
+        // Переименование документа
+        async function renameDocument(documentId, newName) {
+            try {
+                const response = await fetch('api/document/rename', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ DocumentId: documentId, NewName: newName })
+                });
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Ошибка при переименовании документа');
+                }
+                renameForm.style.display = 'none';
+                renameErrorMessage.textContent = '';
+                await fetchDocuments();
+            } catch (error) {
+                renameErrorMessage.textContent = error.message;
             }
         }
 
@@ -296,20 +334,35 @@
                 const listItem = document.createElement("li");
                 listItem.classList.add("document-item");
 
+                // Структура элемента с двумя кнопками: переименовать и удалить.
                 listItem.innerHTML = `
-                    <span>${doc.title}</span>
-                    <span>${new Date(doc.created).toLocaleString()}</span>
-                    <button class="delete-btn" data-id="${doc.documentId}">Удалить</button>
-                `;
+            <span>${doc.title}</span>
+            <span>${new Date(doc.created).toLocaleString()}</span>
+            <div class="document-actions">
+              <button class="rename-btn" data-id="${doc.documentId}">Переименовать</button>
+              <button class="delete-btn" data-id="${doc.documentId}">Удалить</button>
+            </div>
+          `;
 
-                // Навешиваем обработчики
+                // Переход в редактор по клику на элемент (исключая клики по кнопкам)
                 listItem.addEventListener("click", () => {
                     window.location.href = `/redactor/${doc.documentId}`;
                 });
 
+                // Обработчик кнопки удаления
                 listItem.querySelector(".delete-btn").addEventListener("click", (e) => {
-                    e.stopPropagation(); // Останавливаем всплытие события
-                    deleteDocument(doc.documentId); // Удаление документа
+                    e.stopPropagation();
+                    deleteDocument(doc.documentId);
+                });
+
+                // Обработчик кнопки переименования
+                listItem.querySelector(".rename-btn").addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    currentDocumentId = doc.documentId;
+                    // Предварительно заполняем форму текущим названием
+                    renameInput.value = doc.title;
+                    renameErrorMessage.textContent = '';
+                    renameForm.style.display = 'block';
                 });
 
                 documentList.appendChild(listItem);
@@ -321,7 +374,7 @@
             createForm.style.display = 'block';
         });
 
-        // Закрыть форму
+        // Закрыть форму создания документа
         closeFormButton.addEventListener("click", () => {
             createForm.style.display = 'none';
             errorMessage.textContent = '';
@@ -335,6 +388,22 @@
             } else {
                 errorMessage.textContent = "Название документа не может быть пустым.";
             }
+        });
+
+        // Закрыть форму переименования
+        closeRenameFormButton.addEventListener("click", () => {
+            renameForm.style.display = 'none';
+            renameErrorMessage.textContent = '';
+        });
+
+        // Обработчик кнопки переименования документа
+        renameButton.addEventListener("click", () => {
+            const newName = renameInput.value.trim();
+            if (!newName) {
+                renameErrorMessage.textContent = "Новое название не может быть пустым.";
+                return;
+            }
+            renameDocument(currentDocumentId, newName);
         });
 
         // Инициализация

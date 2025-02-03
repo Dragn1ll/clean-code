@@ -74,8 +74,8 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
                 .Include(a => a.User)
                 .ToListAsync();
 
-            var users = userEntities.Select(userEntity => new User(userEntity.UserId, 
-                userEntity.User.Username, userEntity.User.Email, userEntity.User.PasswordHash, 
+            var users = userEntities.Select(userEntity => User.Create(userEntity.User.Id, userEntity.User.Username,
+                userEntity.User.Email, userEntity.User.PasswordHash, 
                 (Role)userEntity.User.RoleId)).ToList();
 
             return Result<IEnumerable<User>>.Success(users);
@@ -95,8 +95,8 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
                 .Include(a => a.User)
                 .ToListAsync();
 
-            var users = userEntities.Select(userEntity => new User(userEntity.UserId, 
-                userEntity.User.Username, userEntity.User.Email, userEntity.User.PasswordHash, 
+            var users = userEntities.Select(userEntity => User.Create(userEntity.User.Id , userEntity.User.Username,
+                userEntity.User.Email, userEntity.User.PasswordHash, 
                 (Role)userEntity.User.RoleId)).ToList();
 
             return Result<IEnumerable<User>>.Success(users);
@@ -116,8 +116,8 @@ public class AccessesRepository(WebDbContext dbContext) : IAccessRepository
                 .Include(a => a.User)
                 .ToListAsync();
 
-            var users = userEntities.Select(userEntity => new User(userEntity.UserId, 
-                userEntity.User.Username, userEntity.User.Email, userEntity.User.PasswordHash, 
+            var users = userEntities.Select(userEntity => User.Create(userEntity.User.Id , userEntity.User.Username,
+                userEntity.User.Email, userEntity.User.PasswordHash, 
                 (Role)userEntity.User.RoleId)).ToList();
 
             return Result<IEnumerable<User>>.Success(users);

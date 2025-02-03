@@ -88,7 +88,7 @@ public class AccessService(
     {
         var checkDocumentResult = await documentService.Check(documentId);
         if (!checkDocumentResult.IsSuccess)
-            return Result<IEnumerable<User>>.Failure(checkDocumentResult.Error);
+            return Result.Failure(checkDocumentResult.Error);
 
         return await accessRepository.Delete(documentId, userId);
     }

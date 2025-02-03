@@ -19,93 +19,99 @@ public class Renderer : IRenderer
         { Style.Header3, "###" }, { Style.Header4, "####" },{ Style.Header5, "#####" }, 
         { Style.Header6, "######" }, { Style.Shielding, "\\"} };
 
-    public string Render(List<Token?> tokens, string inputLine)
+    public async Task<string> Render(List<Token?> tokens, string inputLine)
     {
-        if (tokens.Count == 0)
-            return inputLine;
-        
-        var tokensStartIndexSort = tokens.OrderBy(x => x!.StartIndex)
-                                                    .Where(x => x!.StartIndex != -1)
-                                                    .ToList();
-        var tokensEndIndexSort = tokens.OrderBy(x => x!.EndIndex)
-                                                    .ToList();
-
-        var lastEndTagIndex = tokensEndIndexSort.Count - 1;
-        var lastStartTagIndex = tokensStartIndexSort.Count - 1;
-
-        var listInputTokens = new List<Token?>();
-
-        var stringBuilder = new StringBuilder(inputLine);
-
-        for (var index = inputLine.Length - 1; index >= 0; index--)
+        return await Task.Run(async () =>
         {
-            if (lastStartTagIndex > -1 && listInputTokens.Count > 0)
+            if (tokens.Count == 0)
+                return inputLine;
+        
+            var tokensStartIndexSort = tokens.OrderBy(x => x!.StartIndex)
+                                                        .Where(x => x!.StartIndex != -1)
+                                                        .ToList();
+            var tokensEndIndexSort = tokens.OrderBy(x => x!.EndIndex)
+                                                        .ToList();
+
+            var lastEndTagIndex = tokensEndIndexSort.Count - 1;
+            var lastStartTagIndex = tokensStartIndexSort.Count - 1;
+
+            var listInputTokens = new List<Token?>();
+
+            var stringBuilder = new StringBuilder(inputLine);
+
+            for (var index = inputLine.Length - 1; index >= 0; index--)
             {
-                var tokenStartIndex = tokensStartIndexSort[lastStartTagIndex];
-                
-                if (tokenStartIndex!.StartIndex == index)
+                if (lastStartTagIndex > -1 && listInputTokens.Count > 0)
                 {
-                    if (!ThereAreDigits(inputLine, tokenStartIndex.StartIndex, tokenStartIndex.EndIndex) 
-                        && listInputTokens.Contains(tokenStartIndex))
+                    var tokenStartIndex = tokensStartIndexSort[lastStartTagIndex];
+                    
+                    if (tokenStartIndex!.StartIndex == index)
                     {
-                        stringBuilder.Replace(StyleToMd[tokenStartIndex.Style],
-                            StyleToHtml[tokenStartIndex.Style][0], tokenStartIndex.StartIndex,
-                            StyleToMd[tokenStartIndex.Style].Length);
+                        if (!(await ThereAreDigits(inputLine, tokenStartIndex.StartIndex, tokenStartIndex.EndIndex)) 
+                            && listInputTokens.Contains(tokenStartIndex))
+                        {
+                            stringBuilder.Replace(StyleToMd[tokenStartIndex.Style],
+                                StyleToHtml[tokenStartIndex.Style][0], tokenStartIndex.StartIndex,
+                                StyleToMd[tokenStartIndex.Style].Length);
 
-                        listInputTokens.Remove(tokenStartIndex);
+                            listInputTokens.Remove(tokenStartIndex);
+                        }
+
+                        lastStartTagIndex--;
                     }
+                }
 
-                    lastStartTagIndex--;
+                if (lastEndTagIndex <= -1) continue;
+                
+                var tokenEndIndex = tokensEndIndexSort[lastEndTagIndex];
+                
+                if (tokenEndIndex!.Style == Style.Shielding)
+                {
+                    stringBuilder.Replace(StyleToMd[tokenEndIndex.Style],
+                        StyleToHtml[tokenEndIndex.Style][0], tokenEndIndex.EndIndex,
+                        StyleToMd[tokenEndIndex.Style].Length);
+                    
+                    lastEndTagIndex--;
+                }
+                
+                else if (tokenEndIndex.StartIndex > -1 
+                         && (await ThereAreDigits(inputLine, tokenEndIndex.StartIndex, tokenEndIndex.EndIndex)))
+                    lastEndTagIndex--;
+
+                else if (listInputTokens.Count > 0
+                         && tokenEndIndex.Style != listInputTokens[^1]!.Style
+                         && listInputTokens[^1] is { Style: Style.Italic }
+                         && tokenEndIndex.StartIndex > listInputTokens[^1]!.StartIndex)
+                {
+                    lastEndTagIndex--;
+                }
+                
+                else if (tokenEndIndex.EndIndex == index )
+                {
+                    stringBuilder.Replace(StyleToMd[tokenEndIndex.Style],
+                        StyleToHtml[tokenEndIndex.Style][1], index,
+                        StyleToMd[tokenEndIndex.Style].Length);
+
+                    listInputTokens.Add(tokenEndIndex);
+                    lastEndTagIndex--;
                 }
             }
 
-            if (lastEndTagIndex <= -1) continue;
-            
-            var tokenEndIndex = tokensEndIndexSort[lastEndTagIndex];
-            
-            if (tokenEndIndex!.Style == Style.Shielding)
-            {
-                stringBuilder.Replace(StyleToMd[tokenEndIndex.Style],
-                    StyleToHtml[tokenEndIndex.Style][0], tokenEndIndex.EndIndex,
-                    StyleToMd[tokenEndIndex.Style].Length);
-                
-                lastEndTagIndex--;
-            }
-            
-            else if (tokenEndIndex.StartIndex > -1 
-                     && ThereAreDigits(inputLine, tokenEndIndex.StartIndex, tokenEndIndex.EndIndex))
-                lastEndTagIndex--;
-
-            else if (listInputTokens.Count > 0
-                     && tokenEndIndex.Style != listInputTokens[^1]!.Style
-                     && listInputTokens[^1] is { Style: Style.Italic }
-                     && tokenEndIndex.StartIndex > listInputTokens[^1]!.StartIndex)
-            {
-                lastEndTagIndex--;
-            }
-            
-            else if (tokenEndIndex.EndIndex == index )
-            {
-                stringBuilder.Replace(StyleToMd[tokenEndIndex.Style],
-                    StyleToHtml[tokenEndIndex.Style][1], index,
-                    StyleToMd[tokenEndIndex.Style].Length);
-
-                listInputTokens.Add(tokenEndIndex);
-                lastEndTagIndex--;
-            }
-        }
-
-        return stringBuilder.ToString();
+            return stringBuilder.ToString();
+        });
     }
 
-    private static bool ThereAreDigits(string line, int start, int end)
+    private async Task<bool> ThereAreDigits(string line, int start, int end)
     {
-        for (var index = start; index < end + 1; index++)
+        return await Task.Run(() =>
         {
-            if (char.IsDigit(line[index]))
-                return true;
-        }
+            for (var index = start; index < end + 1; index++)
+            {
+                if (char.IsDigit(line[index]))
+                    return true;
+            }
 
-        return false;
+            return false;
+        });
     }
 }
